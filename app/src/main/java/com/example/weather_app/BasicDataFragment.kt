@@ -18,10 +18,7 @@ class BasicDataFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<Button>(R.id.cityData)?.setOnClickListener {
-            val citiesIntent = Intent(requireActivity(), CitiesActivity::class.java)
-            startActivity(citiesIntent)
-        }
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

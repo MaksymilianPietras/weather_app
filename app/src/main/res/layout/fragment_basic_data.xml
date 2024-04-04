@@ -12,13 +12,14 @@
         android:orientation="vertical"
         android:background="@color/FragmentBackgroundColor">
 
-        <Button
-            android:id="@+id/cityData"
+        <TextView
+            android:id="@+id/city"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
             android:gravity="center"
-            android:text="TextView"
+            android:text="city"
+            android:layout_marginTop="80dp"
             android:textColor="@color/textColor"
             android:textColorLink="@android:color/transparent"
             android:textSize="@dimen/phone_plain_header"
@@ -27,40 +28,69 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/geoCords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="geoCords"
+            android:textColor="@color/textColor"
+            android:layout_marginTop="@dimen/labelsMargin"
+            android:textSize="@dimen/phone_plain_extra"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/city" />
+
+        <TextView
             android:id="@+id/temperature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="@dimen/labelsMargin"
             android:gravity="center"
-            android:text="TextView"
+            android:text="temperature"
             android:textSize="@dimen/phone_plain_temperature"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityData"
+            app:layout_constraintTop_toBottomOf="@+id/geoCords"
             android:textColor="@color/textColor"/>
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="time"
+            android:textColor="@color/textColor"
+            android:layout_marginTop="@dimen/labelsMargin"
+            android:textSize="@dimen/phone_plain_extra"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/temperature" />
 
         <TextView
             android:id="@+id/pressure"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:gravity="center"
-            android:text="TextView"
+            android:text="pressure"
+            android:textColor="@color/textColor"
+            android:layout_marginTop="@dimen/labelsMargin"
             android:textSize="@dimen/phone_plain_extra"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weatherKind"
-            android:textColor="@color/textColor"/>
+            app:layout_constraintTop_toBottomOf="@+id/time" />
 
         <LinearLayout
-            android:id="@+id/weatherKind"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:orientation="horizontal"
+            app:layout_constraintHeight_percent="0.35"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/temperature"
-            android:textColor="@color/textColor"></LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/pressure"></LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
