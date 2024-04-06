@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.LocationServices
 import android.Manifest
+import android.content.Context
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import fuel.Fuel
@@ -22,7 +23,6 @@ import com.google.gson.Gson
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewPagerAdapter: ViewPagerAdapter
-    private var weather: WeatherData = WeatherData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         if (checkLocationPermission()) {
             setYourLocationData()
@@ -82,30 +83,57 @@ class MainActivity : AppCompatActivity() {
         if (checkLocationPermission()) {
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location ->
-                    if (location != null) {
-
-                        var apiManager = ApiManager(location.latitude, location.longitude)
-                        runBlocking {
-                            var body = Fuel.get(apiManager.getApiUri()).body
-                            weather = Gson().fromJson(body, WeatherData::class.java)
-                            (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weather)
-                        }
-
-                    } else {
-                        Toast.makeText(
-                            this,
-                            "Nie można uzyskać aktualnej lokalizacji",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    setLocationDataByCords(location, this, viewPagerAdapter)
                 }
         } else {
             requestLocationPermission()
         }
     }
 
+    companion object {
+        fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
+            if (location != null) {
+                var weatherData: WeatherData
+                var apiManager = ApiManager(location.latitude, location.longitude)
+                runBlocking {
+                    var body = Fuel.get(apiManager.getApiUri()).body
+                    weatherData = Gson().fromJson(body, WeatherData::class.java)
+                    (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+                }
 
-    private inner class ViewPagerAdapter(
+            } else {
+                Toast.makeText(
+                    context,
+                    "Nie można uzyskać aktualnej lokalizacji",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
+
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter){
+            if (cityName != "") {
+                var weatherData: WeatherData
+                var apiManager = ApiManager(cityName)
+                runBlocking {
+                    var body = Fuel.get(apiManager.getApiUri()).body
+                    weatherData = Gson().fromJson(body, WeatherData::class.java)
+                    (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+                }
+
+            } else {
+                Toast.makeText(
+                    context,
+                    "Nie można uzyskać aktualnej lokalizacji",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
+    }
+
+
+    inner class ViewPagerAdapter(
         private val fragmentList: List<Fragment>,
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle
