@@ -49,9 +49,13 @@ class CitiesFragment : Fragment() {
         }
 
         requireView().findViewById<ImageButton>(R.id.addCityBtn).setOnClickListener {
-            val newCity = requireView().findViewById<EditText>(R.id.cityNameText).text
-            saveCityNameToInternalStorage(newCity.toString())
-            createFavouriteCityBtn(newCity.toString(), view)
+            var newCity = requireView().findViewById<EditText>(R.id.cityNameText).text.toString()
+            newCity = newCity.trim()
+            val cities = readCitiesFromInternalStorage()
+            if (!cities.contains("$newCity|")){
+                saveCityNameToInternalStorage(newCity)
+                createFavouriteCityBtn(newCity, view)
+            }
         }
     }
 
