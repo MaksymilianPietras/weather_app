@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="phone_plain_header">30sp</dimen>
-    <dimen name="phone_plain_extra">20sp</dimen>
-    <dimen name="phone_plain_temperature">50sp</dimen>
+    <dimen name="plain_header">30sp</dimen>
+    <dimen name="plain_extra">20sp</dimen>
+    <dimen name="plain_temperature">50sp</dimen>
+    <dimen name="city_label_height">100dp</dimen>
+    <dimen name="trash_image_padding_top_bottom">15dp</dimen>
+    <dimen name="trash_image_padding_left_right">20dp</dimen>
 </resources>

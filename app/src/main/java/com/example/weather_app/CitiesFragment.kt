@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -55,17 +56,54 @@ class CitiesFragment : Fragment() {
 
 
     private fun createFavouriteCityBtn(cityName: String, view: View) {
+        val cityLabel = LinearLayout(requireContext())
+        cityLabel.orientation = LinearLayout.HORIZONTAL
+        cityLabel.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.city_label_height)
+
+            )
+
+        cityLabel.gravity = Gravity.CENTER
         val cityBtn = Button(requireContext())
         cityBtn.text = cityName
         cityBtn.setBackgroundResource(R.drawable.city_btn_background)
         cityBtn.gravity = Gravity.CENTER
+        cityBtn.setTextColor(resources.getColor(R.color.textColor))
+
+        cityBtn.layoutParams = LinearLayout.LayoutParams(
+            0,
+            (resources.getDimensionPixelSize(R.dimen.city_label_height) * 0.8).toInt(),
+            0.85F
+        )
 
 
         cityBtn.setOnClickListener {
             var adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
             MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
         }
-        view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).addView(cityBtn)
+
+        val deleteCityBtn = ImageButton(requireContext())
+        deleteCityBtn.setBackgroundResource(R.drawable.delete_city_background)
+        deleteCityBtn.setImageResource(R.drawable.trash)
+        deleteCityBtn.scaleType = ImageView.ScaleType.FIT_XY
+
+        deleteCityBtn.layoutParams = LinearLayout.LayoutParams(
+            0,
+            resources.getDimensionPixelSize(R.dimen.city_label_height) / 2,
+            0.15F
+        )
+
+        deleteCityBtn.setPadding(
+            resources.getDimensionPixelSize(R.dimen.trash_image_padding_left_right),
+            resources.getDimensionPixelSize(R.dimen.trash_image_padding_top_bottom),
+            resources.getDimensionPixelSize(R.dimen.trash_image_padding_left_right),
+            resources.getDimensionPixelSize(R.dimen.trash_image_padding_top_bottom)
+        )
+
+        cityLabel.addView(cityBtn)
+        cityLabel.addView(deleteCityBtn)
+        view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).addView(cityLabel)
     }
 
 
