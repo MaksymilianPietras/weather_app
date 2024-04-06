@@ -16,6 +16,7 @@ class WeatherData{
 
     inner class Weather{
         var main: String = ""
+        var icon: String = ""
     }
 
     inner class Main{

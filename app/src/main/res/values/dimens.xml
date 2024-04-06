@@ -4,8 +4,10 @@
     <dimen name="plain_extra">20sp</dimen>
     <dimen name="plain_temperature">50sp</dimen>
     <dimen name="city_label_height">100dp</dimen>
+    <dimen name="weather_main_data_layout_height">150dp</dimen>
     <dimen name="city_label_text_max_size">10sp</dimen>
     <dimen name="city_label_text_min_size">5sp</dimen>
+    <dimen name="weather_type_text_size">10sp</dimen>
     <dimen name="trash_image_padding_top_bottom">15dp</dimen>
     <dimen name="trash_image_padding_left_right">20dp</dimen>
 </resources>

@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.picasso:picasso:2.8")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -70,7 +71,7 @@ class CitiesFragment : Fragment() {
         cityBtn.text = cityName
         cityBtn.setBackgroundResource(R.drawable.city_btn_background)
         cityBtn.gravity = Gravity.CENTER
-        cityBtn.setTextColor(resources.getColor(R.color.textColor))
+        cityBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColor))
         cityBtn.setAutoSizeTextTypeUniformWithConfiguration(resources.getDimension(R.dimen.city_label_text_min_size).toInt(),
             resources.getDimension(R.dimen.city_label_text_max_size).toInt(), 1, TypedValue.COMPLEX_UNIT_SP)
         cityBtn.layoutParams = LinearLayout.LayoutParams(
@@ -84,6 +85,7 @@ class CitiesFragment : Fragment() {
             Configuration.setTemperatureUnit(TemperatureUnit.K)
             BasicDataFragment.timeCounterScheduler.shutdown()
             val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+            adapter.getFragmentAtPosition(0).requireView().findViewById<LinearLayout>(R.id.weatherMainData).removeAllViews()
             MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
             adapter.setCurrentItem(0)
         }

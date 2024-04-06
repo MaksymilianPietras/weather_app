@@ -84,14 +84,15 @@
             app:layout_constraintTop_toBottomOf="@+id/time" />
 
         <LinearLayout
+            android:id="@+id/weatherMainData"
             android:layout_width="match_parent"
-            app:layout_constraintHeight_percent="0.35"
             android:layout_height="0dp"
-            android:orientation="vertical"
             android:layout_marginTop="10dp"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.35"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pressure"></LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/pressure" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
