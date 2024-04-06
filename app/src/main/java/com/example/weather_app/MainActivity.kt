@@ -17,9 +17,12 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.runBlocking
+import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private var weather: WeatherData = WeatherData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,14 +32,16 @@ class MainActivity : AppCompatActivity() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (checkLocationPermission()) {
-            getYourLocationData()
+            setYourLocationData()
+
         } else {
             requestLocationPermission()
         }
 
         val fragmentList = listOf(BasicDataFragment(), CitiesFragment())
-        val viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
+        viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
+
     }
 
     private fun checkLocationPermission(): Boolean {
@@ -62,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getYourLocationData()
+                setYourLocationData()
             } else {
                 Toast.makeText(
                     this,
@@ -73,16 +78,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getYourLocationData() {
+    private fun setYourLocationData(){
         if (checkLocationPermission()) {
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location ->
                     if (location != null) {
+
                         var apiManager = ApiManager(location.latitude, location.longitude)
                         runBlocking {
-                            val weather = Fuel.get(apiManager.getApiUri())
-                                .body.toString()
-                            println(weather)
+                            var body = Fuel.get(apiManager.getApiUri()).body
+                            weather = Gson().fromJson(body, WeatherData::class.java)
+                            (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weather)
                         }
 
                     } else {
@@ -112,5 +118,10 @@ class MainActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return fragmentList[position]
         }
+
+        fun getFragmentAtPosition(position: Int): Fragment {
+            return fragmentList[position]
+        }
+
     }
 }
