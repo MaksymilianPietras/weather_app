@@ -84,8 +84,9 @@ class CitiesFragment : Fragment() {
 
 
         cityBtn.setOnClickListener {
-            var adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+            val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
             MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
+            adapter.setCurrentItem(0)
         }
 
         val deleteCityBtn = ImageButton(requireContext())

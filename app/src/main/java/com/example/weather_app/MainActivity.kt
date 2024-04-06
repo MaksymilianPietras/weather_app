@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
     inner class ViewPagerAdapter(
         private val fragmentList: List<Fragment>,
         fragmentManager: FragmentManager,
-        lifecycle: Lifecycle
+        lifecycle: Lifecycle,
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
         override fun getItemCount(): Int {
@@ -149,6 +149,10 @@ class MainActivity : AppCompatActivity() {
 
         fun getFragmentAtPosition(position: Int): Fragment {
             return fragmentList[position]
+        }
+
+        fun setCurrentItem(position: Int){
+            findViewById<ViewPager2>(R.id.viewPager).currentItem = position
         }
 
     }
