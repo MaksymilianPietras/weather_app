@@ -2,6 +2,7 @@ package com.example.weather_app
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Display.Mode
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -100,6 +101,17 @@ class CitiesFragment : Fragment() {
             resources.getDimensionPixelSize(R.dimen.trash_image_padding_left_right),
             resources.getDimensionPixelSize(R.dimen.trash_image_padding_top_bottom)
         )
+
+        deleteCityBtn.setOnClickListener {
+            var fileContent = readCitiesFromInternalStorage()
+            val cityToDelete = cityBtn.text.toString()
+            fileContent = fileContent.replace("$cityToDelete|", "")
+            val internalStorage = "weather_data.txt"
+            val fileOutputStream : FileOutputStream = requireActivity().openFileOutput(internalStorage, AppCompatActivity.MODE_PRIVATE)
+            fileOutputStream.bufferedWriter().use { it.write(fileContent) }
+            fileOutputStream.close()
+            view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).removeView(cityLabel)
+        }
 
         cityLabel.addView(cityBtn)
         cityLabel.addView(deleteCityBtn)
