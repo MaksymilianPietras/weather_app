@@ -1,8 +1,7 @@
 package com.example.weather_app
 
-import android.content.Context
 import android.os.Bundle
-import android.view.Display.Mode
+import android.util.TypedValue
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,10 +12,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.util.TypedValueCompat.dpToPx
-import androidx.core.view.marginTop
 import androidx.viewpager2.widget.ViewPager2
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -75,7 +71,8 @@ class CitiesFragment : Fragment() {
         cityBtn.setBackgroundResource(R.drawable.city_btn_background)
         cityBtn.gravity = Gravity.CENTER
         cityBtn.setTextColor(resources.getColor(R.color.textColor))
-
+        cityBtn.setAutoSizeTextTypeUniformWithConfiguration(resources.getDimension(R.dimen.city_label_text_min_size).toInt(),
+            resources.getDimension(R.dimen.city_label_text_max_size).toInt(), 1, TypedValue.COMPLEX_UNIT_SP)
         cityBtn.layoutParams = LinearLayout.LayoutParams(
             0,
             (resources.getDimensionPixelSize(R.dimen.city_label_height) * 0.8).toInt(),
