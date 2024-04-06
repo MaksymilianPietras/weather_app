@@ -7,7 +7,7 @@ class WeatherData{
     var coord: Coords = Coords()
     var weather: List<Weather> = listOf()
     var main: Main = Main()
-    var time: LocalTime = LocalTime.now()
+    var timezone: Int = 0
 
     inner class Coords{
         var lat: Double = 0.0

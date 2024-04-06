@@ -7,6 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 class BasicDataFragment : Fragment() {
@@ -40,8 +46,28 @@ class BasicDataFragment : Fragment() {
             "${weatherData?.coord?.lat}° szer. geogr. ${weatherData?.coord?.lon}° dł. geogr."
         requireView().findViewById<TextView>(R.id.temperature).text =
             weatherData.main.temp.let { Configuration.getTemperature(it, Configuration.getTemperatureUnit()) }
-        requireView().findViewById<TextView>(R.id.time).text = weatherData?.time.toString()
+
+        var zonedDateTime = getTimeForPlace(weatherData)
+        requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
+
+        val scheduler = Executors.newScheduledThreadPool(1)
+
+        val timeCounter = Runnable {
+            zonedDateTime = getTimeForPlace(weatherData)
+            zonedDateTime = zonedDateTime?.plusSeconds(1)
+            requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second)
+        }
+
+        scheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
+
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
+    }
+
+    private fun getTimeForPlace(weatherData: WeatherData): ZonedDateTime? {
+        val date = Instant.now()
+        var zonedDateTime = ZonedDateTime.ofInstant(date, ZoneOffset.UTC)
+        zonedDateTime = zonedDateTime.plusSeconds(weatherData.timezone.toLong())
+        return zonedDateTime
     }
 
 
