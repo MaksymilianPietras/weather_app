@@ -10,12 +10,16 @@ import android.widget.TextView
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 
 class BasicDataFragment : Fragment() {
+    companion object{
+        lateinit var timeCounterScheduler: ScheduledExecutorService
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +54,7 @@ class BasicDataFragment : Fragment() {
         var zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
 
-        val scheduler = Executors.newScheduledThreadPool(1)
+        timeCounterScheduler = Executors.newScheduledThreadPool(1)
 
         val timeCounter = Runnable {
             zonedDateTime = getTimeForPlace(weatherData)
@@ -58,7 +62,7 @@ class BasicDataFragment : Fragment() {
             requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second)
         }
 
-        scheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
+        timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
 
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
     }

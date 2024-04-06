@@ -85,6 +85,7 @@ class CitiesFragment : Fragment() {
 
         cityBtn.setOnClickListener {
             Configuration.setTemperatureUnit(TemperatureUnit.K)
+            BasicDataFragment.timeCounterScheduler.shutdown()
             val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
             MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
             adapter.setCurrentItem(0)
