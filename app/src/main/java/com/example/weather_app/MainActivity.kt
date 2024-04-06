@@ -23,14 +23,15 @@ import com.google.gson.Gson
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private var configuration: Configuration = Configuration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        configuration.setTemperatureUnit(TemperatureUnit.K)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
 
         if (checkLocationPermission()) {
             setYourLocationData()
@@ -114,9 +115,9 @@ class MainActivity : AppCompatActivity() {
         fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter){
             if (cityName != "") {
                 var weatherData: WeatherData
-                var apiManager = ApiManager(cityName)
+                val apiManager = ApiManager(cityName)
                 runBlocking {
-                    var body = Fuel.get(apiManager.getApiUri()).body
+                    val body = Fuel.get(apiManager.getApiUri()).body
                     weatherData = Gson().fromJson(body, WeatherData::class.java)
                     (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
                 }

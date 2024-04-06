@@ -41,18 +41,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/city" />
 
-        <TextView
+        <Button
             android:id="@+id/temperature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/labelsMargin"
+            android:backgroundTint="@android:color/transparent"
             android:gravity="center"
             android:text="temperature"
+            android:textColor="@color/textColor"
             android:textSize="@dimen/plain_temperature"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/geoCords"
-            android:textColor="@color/textColor"/>
+            app:layout_constraintTop_toBottomOf="@+id/geoCords" />
 
         <TextView
             android:id="@+id/time"
