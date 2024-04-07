@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit
 
 class BasicDataFragment : Fragment() {
     companion object{
-        lateinit var timeCounterScheduler: ScheduledExecutorService
+        var timeCounterSchedulerActive = false
+        var timeCounterScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     }
 
 
@@ -62,9 +63,8 @@ class BasicDataFragment : Fragment() {
 
         var zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
-
         timeCounterScheduler = Executors.newScheduledThreadPool(1)
-
+        timeCounterSchedulerActive = true
         val timeCounter = Runnable {
             zonedDateTime = getTimeForPlace(weatherData)
             zonedDateTime = zonedDateTime?.plusSeconds(1)
@@ -72,6 +72,7 @@ class BasicDataFragment : Fragment() {
         }
 
         timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
+
 
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
         val apiManager = ApiManager()
