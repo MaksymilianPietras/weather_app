@@ -1,6 +1,5 @@
 package com.example.weather_app
 
-import java.time.LocalTime
 
 class WeatherData{
     var name: String = ""

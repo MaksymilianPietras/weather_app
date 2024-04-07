@@ -93,15 +93,38 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
+            val weatherData = getLocationDataByCityCords(location, context)
+            if (weatherData != null){
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+            }
+
+        }
+
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter){
+            val weatherData = getLocationDataByCityName(cityName, context)
+            if (weatherData != null){
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+            }
+
+        }
+
+        fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{
             if (location != null) {
                 var weatherData: WeatherData
                 var apiManager = ApiManager(location.latitude, location.longitude)
                 runBlocking {
                     var body = Fuel.get(apiManager.getApiUri()).body
                     weatherData = Gson().fromJson(body, WeatherData::class.java)
-                    (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
                 }
-
+                if (weatherData.name == ""){
+                        Toast.makeText(
+                            context,
+                            "Brak danych pogodowych dla podanej lokalizacji!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    return null
+                }
+                return weatherData
             } else {
                 Toast.makeText(
                     context,
@@ -109,18 +132,26 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
+            return null
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter){
+        fun getLocationDataByCityName(cityName: String, context: Context): WeatherData?{
             if (cityName != "") {
                 var weatherData: WeatherData
                 val apiManager = ApiManager(cityName)
                 runBlocking {
                     val body = Fuel.get(apiManager.getApiUri()).body
                     weatherData = Gson().fromJson(body, WeatherData::class.java)
-                    (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
                 }
+                if (weatherData.name == ""){
+                    Toast.makeText(
+                        context,
+                        "Brak danych pogodowych dla podanej lokalizacji!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return null
+                }
+                return weatherData
 
             } else {
                 Toast.makeText(
@@ -129,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
+            return null
         }
     }
 

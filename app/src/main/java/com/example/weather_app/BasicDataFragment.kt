@@ -28,6 +28,13 @@ class BasicDataFragment : Fragment() {
     companion object{
         var timeCounterSchedulerActive = false
         var timeCounterScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+
+        fun getTimeForPlace(weatherData: WeatherData): ZonedDateTime? {
+            val date = Instant.now()
+            var zonedDateTime = ZonedDateTime.ofInstant(date, ZoneOffset.UTC)
+            zonedDateTime = zonedDateTime.plusSeconds(weatherData.timezone.toLong())
+            return zonedDateTime
+        }
     }
 
 
@@ -111,11 +118,6 @@ class BasicDataFragment : Fragment() {
         }
     }
 
-    private fun getTimeForPlace(weatherData: WeatherData): ZonedDateTime? {
-        val date = Instant.now()
-        var zonedDateTime = ZonedDateTime.ofInstant(date, ZoneOffset.UTC)
-        zonedDateTime = zonedDateTime.plusSeconds(weatherData.timezone.toLong())
-        return zonedDateTime
-    }
+
 
 }
