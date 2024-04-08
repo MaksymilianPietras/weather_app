@@ -75,7 +75,7 @@ class BasicDataFragment : Fragment() {
         val timeCounter = Runnable {
             zonedDateTime = getTimeForPlace(weatherData)
             zonedDateTime = zonedDateTime?.plusSeconds(1)
-            requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second)
+            requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
         }
 
         timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)

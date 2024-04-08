@@ -55,7 +55,7 @@ class CitiesFragment : Fragment() {
                 if (weatherData != null){
                     val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
 
-                    saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second))
+                    saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year))
                     createFavouriteCityBtn(newCity, view)
                     Toast.makeText(
                         context,
