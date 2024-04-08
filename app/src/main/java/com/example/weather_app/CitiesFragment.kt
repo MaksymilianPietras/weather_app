@@ -19,11 +19,63 @@ import androidx.viewpager2.widget.ViewPager2
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
+private const val SECONDS_TO_REFRESH_CITY_DATA = 15
 
 class CitiesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!MainActivity.isNetworkAvailable(requireContext())){
+            Toast.makeText(
+                requireContext(),
+                "Brak połączenia z internetem, nie można zaktualizować danych",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        var fileContent = readCitiesDataFromInternalStorage()
+        val rows = getRowsFromFileContent(fileContent)
+        val citiesDataRefreshTime = rows.map {
+            row ->
+            val formalizedRow = row.substring(0, row.length - 1)
+            listOf(formalizedRow.substring(0, formalizedRow.indexOf('|')), formalizedRow.substring(formalizedRow.lastIndexOf('|') + 1))
+        }
+        val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+        citiesDataRefreshTime.forEach {
+            singleCityData ->
+            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")
+            val localDateTime = LocalDateTime.parse(singleCityData[1], formatter)
+            val cityRefreshTime = ZonedDateTime.of(localDateTime, ZoneOffset.UTC)
+
+            val difference = ChronoUnit.SECONDS.between(currentTime, cityRefreshTime)
+
+            if (difference > SECONDS_TO_REFRESH_CITY_DATA) {
+                Toast.makeText(
+                    requireContext(),
+                    "Zaktualizowano dane o ${singleCityData[0]}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                val weatherData = MainActivity.getLocationDataByCityName(singleCityData[0], requireContext())
+                if (weatherData != null) {
+                    removeCityFromFile(singleCityData[0])
+                    val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
+                    val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                    saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year),
+                        String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year))
+                }
+            }
+        }
+
 
     }
 
@@ -54,8 +106,10 @@ class CitiesFragment : Fragment() {
                 val weatherData = MainActivity.getLocationDataByCityName(newCity, requireContext())
                 if (weatherData != null){
                     val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
+                    val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
 
-                    saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year))
+                    saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year),
+                        String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year))
                     createFavouriteCityBtn(newCity, view)
                     Toast.makeText(
                         context,
@@ -69,11 +123,16 @@ class CitiesFragment : Fragment() {
     }
 
     private fun getCitiesNamesFromFileContent(fileContent: String): List<String> {
-        var splittedCities = fileContent.split("\n")
-        splittedCities = splittedCities.dropLast(1)
+        var splittedCities = getRowsFromFileContent(fileContent)
         splittedCities = splittedCities.map { row ->
             row.substring(0, row.indexOf('|'))
         }
+        return splittedCities
+    }
+
+    private fun getRowsFromFileContent(fileContent: String): List<String> {
+        var splittedCities = fileContent.split("\n")
+        splittedCities = splittedCities.dropLast(1)
         return splittedCities
     }
 
@@ -135,20 +194,25 @@ class CitiesFragment : Fragment() {
         )
 
         deleteCityBtn.setOnClickListener {
-            var fileContent = readCitiesDataFromInternalStorage()
             val city = cityBtn.text.toString()
-            val row = getCityRowFromFileContent(fileContent, city)
-            fileContent = fileContent.replace(row, "")
-            val internalStorage = "weather_data.txt"
-            val fileOutputStream : FileOutputStream = requireActivity().openFileOutput(internalStorage, AppCompatActivity.MODE_PRIVATE)
-            fileOutputStream.bufferedWriter().use { it.write(fileContent) }
-            fileOutputStream.close()
+            removeCityFromFile(city)
             view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).removeView(cityLabel)
         }
 
         cityLabel.addView(cityBtn)
         cityLabel.addView(deleteCityBtn)
         view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).addView(cityLabel)
+    }
+
+    private fun removeCityFromFile(city: String) {
+        var fileContent = readCitiesDataFromInternalStorage()
+        val row = getCityRowFromFileContent(fileContent, city)
+        fileContent = fileContent.replace(row, "")
+        val internalStorage = "weather_data.txt"
+        val fileOutputStream: FileOutputStream =
+            requireActivity().openFileOutput(internalStorage, AppCompatActivity.MODE_PRIVATE)
+        fileOutputStream.bufferedWriter().use { it.write(fileContent) }
+        fileOutputStream.close()
     }
 
     private fun getCityRowFromFileContent(fileContent: String, city: String): String {
@@ -173,13 +237,14 @@ class CitiesFragment : Fragment() {
 
     private fun saveCityDataToInternalStorage(
         weatherData: WeatherData,
-        formattedTime: String
+        formattedTime: String,
+        formattedGettingDataTime: String
     ) {
         val internalStorage = "weather_data.txt"
         val outputStream: FileOutputStream = requireActivity().openFileOutput(internalStorage,
             AppCompatActivity.MODE_APPEND
         )
-        outputStream.bufferedWriter().use { it.write("${weatherData.name}|${weatherData.coord.lat}|${weatherData.coord.lon}|${weatherData.main.temp}|$formattedTime|${weatherData.main.pressure}|\n") }
+        outputStream.bufferedWriter().use { it.write("${weatherData.name}|${weatherData.coord.lat}|${weatherData.coord.lon}|${weatherData.main.temp}|$formattedTime|${weatherData.main.pressure}|$formattedGettingDataTime|\n") }
 
         outputStream.close()
     }

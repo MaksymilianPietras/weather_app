@@ -13,6 +13,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.LocationServices
 import android.Manifest
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import fuel.Fuel
@@ -161,6 +163,15 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
             return null
+        }
+
+        fun isNetworkAvailable(context: Context): Boolean {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            return networkCapabilities != null &&
+                    (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
         }
     }
 
