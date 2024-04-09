@@ -97,17 +97,17 @@ class MainActivity : AppCompatActivity() {
         fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
             val weatherData = getLocationDataByCityCords(location, context)
             if (weatherData != null){
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
             }
 
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter){
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter): WeatherData?{
             val weatherData = getLocationDataByCityName(cityName, context)
             if (weatherData != null){
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
             }
-
+            return weatherData
         }
 
         fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{

@@ -2,6 +2,20 @@ package com.example.weather_app
 
 
 class WeatherData{
+    constructor(name: String, lat: Double, lon: Double, temp: Double, timezone: Int, pressure: Double, weather: String, icon: String){
+        this.name = name
+        this.coord.lat = lat
+        this.coord.lon = lon
+        this.main.temp = temp
+        this.timezone = timezone
+        this.main.pressure = pressure
+        this.weather = mutableListOf(Weather())
+        this.weather[0].main = weather
+        this.weather[0].icon = icon
+    }
+
+    constructor()
+
     var name: String = ""
     var coord: Coords = Coords()
     var weather: List<Weather> = listOf()

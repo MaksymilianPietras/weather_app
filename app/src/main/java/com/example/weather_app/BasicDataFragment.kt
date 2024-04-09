@@ -61,7 +61,7 @@ class BasicDataFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_basic_data, container, false)
     }
 
-    fun setWeatherData(weatherData: WeatherData){
+    fun setWeatherData(weatherData: WeatherData, timerEnable: Boolean){
         requireView().findViewById<TextView>(R.id.city).text = weatherData.name
         requireView().findViewById<TextView>(R.id.geoCords).text =
             "${weatherData?.coord?.lat}° szer. geogr. ${weatherData?.coord?.lon}° dł. geogr."
@@ -70,17 +70,20 @@ class BasicDataFragment : Fragment() {
 
         var zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
-        timeCounterScheduler = Executors.newScheduledThreadPool(1)
-        timeCounterSchedulerActive = true
-        val timeCounter = Runnable {
-            zonedDateTime = getTimeForPlace(weatherData)
-            zonedDateTime = zonedDateTime?.plusSeconds(1)
-            requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
+        if (timerEnable){
+            timeCounterScheduler = Executors.newScheduledThreadPool(1)
+            timeCounterSchedulerActive = true
+            val timeCounter = Runnable {
+                zonedDateTime = getTimeForPlace(weatherData)
+                zonedDateTime = zonedDateTime?.plusSeconds(1)
+                requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
+            }
+
+            timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
         }
 
-        timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
 
-
+        requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
         val apiManager = ApiManager()
         apiManager.setWeatherUri(weatherData.weather[0].icon)

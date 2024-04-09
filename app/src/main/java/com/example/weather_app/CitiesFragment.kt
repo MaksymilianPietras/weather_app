@@ -32,7 +32,6 @@ class CitiesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (!MainActivity.isNetworkAvailable(requireContext())){
             Toast.makeText(
                 requireContext(),
@@ -42,12 +41,12 @@ class CitiesFragment : Fragment() {
             return
         }
 
-        var fileContent = readCitiesDataFromInternalStorage()
+        val fileContent = readCitiesDataFromInternalStorage()
         val rows = getRowsFromFileContent(fileContent)
         val citiesDataRefreshTime = rows.map {
             row ->
             val formalizedRow = row.substring(0, row.length - 1)
-            listOf(formalizedRow.substring(0, formalizedRow.indexOf('|')), formalizedRow.substring(formalizedRow.lastIndexOf('|') + 1))
+            getCityNameAndLastUpdateDateFromRow(formalizedRow)
         }
         val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
         citiesDataRefreshTime.forEach {
@@ -67,7 +66,7 @@ class CitiesFragment : Fragment() {
 
                 val weatherData = MainActivity.getLocationDataByCityName(singleCityData[0], requireContext())
                 if (weatherData != null) {
-                    removeCityFromFile(singleCityData[0])
+                    removeCityFromInternalStorage(singleCityData[0])
                     val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                     val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                     saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year),
@@ -78,6 +77,12 @@ class CitiesFragment : Fragment() {
 
 
     }
+
+    private fun getCityNameAndLastUpdateDateFromRow(formalizedRow: String) =
+        listOf(
+            formalizedRow.substring(0, formalizedRow.indexOf('|')),
+            formalizedRow.substring(formalizedRow.lastIndexOf('|') + 1)
+        )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -164,15 +169,55 @@ class CitiesFragment : Fragment() {
         cityBtn.setOnClickListener {
             Configuration.setTemperatureUnit(TemperatureUnit.K)
 
+            val fileContent = readCitiesDataFromInternalStorage()
+            val rows = getRowsFromFileContent(fileContent)
+            var lastUpdateTimeDifference = 0L
+
             if (BasicDataFragment.timeCounterSchedulerActive){
                 BasicDataFragment.timeCounterSchedulerActive = false
                 BasicDataFragment.timeCounterScheduler.shutdown()
             }
 
+            for (row in rows){
+                val formalizedRow = row.substring(0, row.length - 1)
+                val cityData = getCityNameAndLastUpdateDateFromRow(formalizedRow)
+                if (cityData[0] == cityBtn.text){
+                    val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")
+                    val localDateTime = LocalDateTime.parse(cityData[1], formatter)
+                    val cityRefreshTime = ZonedDateTime.of(localDateTime, ZoneOffset.UTC)
+
+                    lastUpdateTimeDifference = ChronoUnit.SECONDS.between(cityRefreshTime, currentTime)
+                    break
+                }
+
+            }
             val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
             adapter.getFragmentAtPosition(0).requireView().findViewById<LinearLayout>(R.id.weatherMainData).removeAllViews()
-            MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
+
+            if (MainActivity.isNetworkAvailable(requireContext())){
+
+                if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
+                    val weatherData = MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
+                    if (weatherData != null){
+                        removeCityFromInternalStorage(cityName)
+                        val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
+                        val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                        saveCityDataToInternalStorage(weatherData, String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year),
+                            String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year))
+                    }
+
+
+                } else {
+                    setCityDataFromFileLines(rows, cityName, adapter, true)
+
+                }
+
+            } else {
+                setCityDataFromFileLines(rows, cityName, adapter, false)
+            }
             adapter.setCurrentItem(0)
+
         }
 
         val deleteCityBtn = ImageButton(requireContext())
@@ -195,7 +240,7 @@ class CitiesFragment : Fragment() {
 
         deleteCityBtn.setOnClickListener {
             val city = cityBtn.text.toString()
-            removeCityFromFile(city)
+            removeCityFromInternalStorage(city)
             view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).removeView(cityLabel)
         }
 
@@ -204,7 +249,36 @@ class CitiesFragment : Fragment() {
         view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).addView(cityLabel)
     }
 
-    private fun removeCityFromFile(city: String) {
+    private fun setCityDataFromFileLines(
+        rows: List<String>,
+        cityName: String,
+        adapter: MainActivity.ViewPagerAdapter,
+        timerEnable: Boolean
+    ) {
+        for (row in rows) {
+            val formalizedRow = row.substring(0, row.length - 1)
+            val cityDataList = formalizedRow.split('|')
+            if (cityDataList[0] == cityName) {
+                val weatherData = WeatherData(
+                    cityDataList[0],
+                    cityDataList[1].toDouble(),
+                    cityDataList[2].toDouble(),
+                    cityDataList[3].toDouble(),
+                    cityDataList[6].toInt(),
+                    cityDataList[5].toDouble(),
+                    cityDataList[7],
+                    cityDataList[8]
+                )
+                (adapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(
+                    weatherData,
+                    timerEnable
+                )
+                break
+            }
+        }
+    }
+
+    private fun removeCityFromInternalStorage(city: String) {
         var fileContent = readCitiesDataFromInternalStorage()
         val row = getCityRowFromFileContent(fileContent, city)
         fileContent = fileContent.replace(row, "")
@@ -216,8 +290,8 @@ class CitiesFragment : Fragment() {
     }
 
     private fun getCityRowFromFileContent(fileContent: String, city: String): String {
-        val row = fileContent.substring(fileContent.indexOf("$city|"))
-        row.substring(0, row.indexOf("\n"))
+        var row = fileContent.substring(fileContent.indexOf("$city|"))
+        row = row.substring(0, row.indexOf("\n") + 1)
         return row
     }
 
@@ -244,7 +318,7 @@ class CitiesFragment : Fragment() {
         val outputStream: FileOutputStream = requireActivity().openFileOutput(internalStorage,
             AppCompatActivity.MODE_APPEND
         )
-        outputStream.bufferedWriter().use { it.write("${weatherData.name}|${weatherData.coord.lat}|${weatherData.coord.lon}|${weatherData.main.temp}|$formattedTime|${weatherData.main.pressure}|$formattedGettingDataTime|\n") }
+        outputStream.bufferedWriter().use { it.write("${weatherData.name}|${weatherData.coord.lat}|${weatherData.coord.lon}|${weatherData.main.temp}|$formattedTime|${weatherData.main.pressure}|${weatherData.timezone}|${weatherData.weather[0].main}|${weatherData.weather[0].icon}|$formattedGettingDataTime|\n") }
 
         outputStream.close()
     }
