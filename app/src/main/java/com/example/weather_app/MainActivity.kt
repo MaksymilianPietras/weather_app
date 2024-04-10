@@ -102,10 +102,10 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter): WeatherData?{
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): WeatherData?{
             val weatherData = getLocationDataByCityName(cityName, context)
             if (weatherData != null){
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
             }
             return weatherData
         }

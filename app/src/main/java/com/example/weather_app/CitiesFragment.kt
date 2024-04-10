@@ -206,7 +206,7 @@ class CitiesFragment : Fragment() {
             if (MainActivity.isNetworkAvailable(requireContext())){
 
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
-                    updateCityData(cityName, adapter)
+                    updateCityData(cityName, adapter, true)
 
 
                 } else {
@@ -216,7 +216,7 @@ class CitiesFragment : Fragment() {
                 val scheduler = Executors.newScheduledThreadPool(1)
 
                 val refreshCityDataTask = Runnable {
-                    updateCityData(cityName, adapter)
+                    updateCityData(cityName, adapter, false)
                 }
 
                 scheduler.scheduleAtFixedRate(refreshCityDataTask, 0,
@@ -262,10 +262,11 @@ class CitiesFragment : Fragment() {
 
     private fun updateCityData(
         cityName: String,
-        adapter: MainActivity.ViewPagerAdapter
+        adapter: MainActivity.ViewPagerAdapter,
+        startTimerCounter: Boolean
     ) {
         val weatherData =
-            MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter)
+            MainActivity.setLocationDataByCityName(cityName, requireContext(), adapter, startTimerCounter)
         if (weatherData != null) {
             removeCityFromInternalStorage(cityName)
             val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
