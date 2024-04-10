@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -215,6 +216,8 @@ class CitiesFragment : Fragment() {
 
             } else {
                 setCityDataFromFileLines(rows, cityName, adapter, false)
+                adapter.getFragmentAtPosition(0).requireView().findViewById<TextView>(R.id.city).text =
+                    "$cityName (Przestarzałe dane)"
             }
             adapter.setCurrentItem(0)
 
