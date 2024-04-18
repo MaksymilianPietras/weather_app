@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="MainBackgroundColor">#384c6c</color>
+    <color name="AdditionalInfoLayoutColor">#273b5b</color>
     <color name="WeatherDataBackgroundColor">#051939</color>
     <color name="FragmentBackgroundColor">#495d7d</color>
     <color name="DeleteCityBackgroundColor">#E53935</color>

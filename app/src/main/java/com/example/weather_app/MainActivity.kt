@@ -21,6 +21,8 @@ import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.runBlocking
 import com.google.gson.Gson
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -31,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         configuration.setTemperatureUnit(TemperatureUnit.K)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -42,9 +45,14 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
 
-        val fragmentList = listOf(BasicDataFragment(), CitiesFragment())
+        val fragmentList = listOf(BasicDataFragment(), CitiesFragment(), WindFragment())
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
+
+        //TODO naprawić włączanie timera bo daje niepełne info i sie wiesza
+        val fileData = CitiesFragment.readCitiesDataFromInternalStorage(this)
+        val citiesNames = CitiesFragment.getCitiesNamesFromFileContent(fileData)
+        createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter)
 
     }
 
@@ -63,6 +71,31 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ),
             1
+        )
+    }
+
+    private fun createGettingFavouriteCityDataRoutine(
+        citiesNames: List<String>,
+        adapter: MainActivity.ViewPagerAdapter,
+    ) {
+        val scheduler = Executors.newScheduledThreadPool(1)
+
+        val refreshCityDataTask = Runnable {
+            if (isNetworkAvailable(this)){
+                for (city in citiesNames){
+                    CitiesFragment.updateCityData(city, adapter, false, this, this)
+                }
+                Toast.makeText(
+                    this,
+                    "Zakutalizowano dane o miastach",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        scheduler.scheduleAtFixedRate(
+            refreshCityDataTask, 0,
+            1, TimeUnit.SECONDS
         )
     }
 
@@ -98,6 +131,7 @@ class MainActivity : AppCompatActivity() {
             val weatherData = getLocationDataByCityCords(location, context)
             if (weatherData != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
+                (viewPagerAdapter.getFragmentAtPosition(2) as WindFragment).setLocationAdditionalInfo(weatherData)
             }
 
         }
@@ -106,6 +140,7 @@ class MainActivity : AppCompatActivity() {
             val weatherData = getLocationDataByCityName(cityName, context)
             if (weatherData != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
+                (viewPagerAdapter.getFragmentAtPosition(2) as WindFragment).setLocationAdditionalInfo(weatherData)
             }
             return weatherData
         }
