@@ -24,6 +24,8 @@ import com.google.gson.Gson
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+private const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
+
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewPagerAdapter: ViewPagerAdapter
@@ -133,11 +135,7 @@ class MainActivity : AppCompatActivity() {
                 WindFragment.newInstance(weatherData)
 
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
-                if (viewPagerAdapter.itemCount > 2){
-                    WindFragment.setLocationAdditionalInfo(weatherData, viewPagerAdapter.getFragmentAtPosition(2).requireView())
-                } else {
-                    viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
-                }
+                setAdditionalInfoFragment(viewPagerAdapter, weatherData)
             }
 
         }
@@ -146,13 +144,24 @@ class MainActivity : AppCompatActivity() {
             val weatherData = getLocationDataByCityName(cityName, context)
             if (weatherData != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
-                if (viewPagerAdapter.itemCount > 2){
-                    WindFragment.setLocationAdditionalInfo(weatherData, viewPagerAdapter.getFragmentAtPosition(2).requireView())
-                } else {
-                    viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
-                }
+                setAdditionalInfoFragment(viewPagerAdapter, weatherData)
             }
             return weatherData
+        }
+
+        fun setAdditionalInfoFragment(
+            viewPagerAdapter: ViewPagerAdapter,
+            weatherData: WeatherData
+        ) {
+            if (viewPagerAdapter.itemCount > 2) {
+                WindFragment.setLocationAdditionalInfo(
+                    weatherData,
+                    viewPagerAdapter.getFragmentAtPosition(ADDITIONAL_INFO_FRAGMENT_INDEX)
+                        .requireView()
+                )
+            } else {
+                viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
+            }
         }
 
         fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{
@@ -239,9 +248,6 @@ class MainActivity : AppCompatActivity() {
             return fragmentList[position]
         }
 
-        fun setFragmentAtPosition(position: Int, fragment: Fragment){
-            fragmentList[position] = fragment
-        }
 
         fun setCurrentItem(position: Int){
             findViewById<ViewPager2>(R.id.viewPager).currentItem = position

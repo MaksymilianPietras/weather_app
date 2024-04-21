@@ -280,6 +280,7 @@ class CitiesFragment : Fragment() {
                         cityData,
                         timerEnable
                     )
+                    MainActivity.setAdditionalInfoFragment(adapter, cityData)
                     break
                 }
             }
