@@ -5,15 +5,28 @@ class ApiManager {
     private val API_KEY = "41b05a0d1a410e43fb0d797d6c800b88"
     private val WEATHER_ICON_BASE_URI = "https://openweathermap.org/img/wn/"
     private val WEATHER_ICON_SUFFIX_URI = "@2x.png"
+    private val FORECAST_API_BASE = "https://api.openweathermap.org/data/2.5/forecast"
+    private lateinit var forecastApiUrl: String
     private lateinit var apiUri: String
     private lateinit var iconUri: String
-
     fun getApiUri(): String{
         return apiUri
     }
 
-    fun setWeatherUri(code: String){
+    fun setWeatherUriByCityName(code: String){
         iconUri = WEATHER_ICON_BASE_URI + code + WEATHER_ICON_SUFFIX_URI
+    }
+
+    fun setWeatherUriByCords(lat: Double, lon: Double){
+        forecastApiUrl = "$FORECAST_API_BASE?lat$lat&lon=$lon&appid=$API_KEY"
+    }
+
+    fun setForecastUri(cityName: String){
+        forecastApiUrl = "$FORECAST_API_BASE?q=$cityName&appid=$API_KEY"
+    }
+
+    fun getForecastUri(): String{
+        return forecastApiUrl
     }
 
     fun getWeatherUri(): String {
@@ -21,11 +34,11 @@ class ApiManager {
     }
 
     constructor(lat: Double, lon:Double){
-        apiUri = API_BASE + "?lat=" + lat + "&lon=" + lon + "&appid=" + API_KEY
+        apiUri = "$API_BASE?lat=$lat&lon=$lon&appid=$API_KEY"
     }
 
     constructor(cityName: String){
-        apiUri = API_BASE + "?q=" + cityName + "&appid=" + API_KEY
+        apiUri = "$API_BASE?q=$cityName&appid=$API_KEY"
     }
 
     constructor(){}

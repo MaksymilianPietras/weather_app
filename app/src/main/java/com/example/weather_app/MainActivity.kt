@@ -25,6 +25,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 private const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
+private const val FORECAST_FRAGMENT_INDEX = 3
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -131,7 +132,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
             val weatherData = getLocationDataByCityCords(location, context)
-            if (weatherData != null){
+            val weatherForecast = getLocationForecastByCityCords(location, context)
+            if (weatherData != null && weatherForecast != null){
                 WindFragment.newInstance(weatherData)
 
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
@@ -142,16 +144,18 @@ class MainActivity : AppCompatActivity() {
 
         fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): WeatherData?{
             val weatherData = getLocationDataByCityName(cityName, context)
-            if (weatherData != null){
+            val weatherForecast = getLocationForecastByCityName(cityName, context)
+            if (weatherData != null && weatherForecast != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
                 setAdditionalInfoFragment(viewPagerAdapter, weatherData)
+                setForecastFragment(viewPagerAdapter, weatherForecast)
             }
             return weatherData
         }
 
         fun setAdditionalInfoFragment(
             viewPagerAdapter: ViewPagerAdapter,
-            weatherData: WeatherData
+            weatherData: WeatherData,
         ) {
             if (viewPagerAdapter.itemCount > 2) {
                 WindFragment.setLocationAdditionalInfo(
@@ -163,6 +167,22 @@ class MainActivity : AppCompatActivity() {
                 viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
             }
         }
+
+        fun setForecastFragment(
+            viewPagerAdapter: ViewPagerAdapter,
+            weatherForecast: WeatherForecast,
+        ) {
+            if (viewPagerAdapter.itemCount > 3) {
+                WeatherForecastFragment.setForecastInfo(
+                    weatherForecast,
+                    viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
+                        .requireView()
+                )
+            } else {
+                viewPagerAdapter.addFragmentToViewPager(WeatherForecastFragment.newInstance(weatherForecast))
+            }
+        }
+
 
         fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{
             if (location != null) {
@@ -208,6 +228,65 @@ class MainActivity : AppCompatActivity() {
                     return null
                 }
                 return weatherData
+
+            } else {
+                Toast.makeText(
+                    context,
+                    "Nie można uzyskać aktualnej lokalizacji",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            return null
+        }
+
+
+        fun getLocationForecastByCityCords(location: android.location.Location?, context: Context): WeatherForecast?{
+            if (location != null) {
+                var weatherForecast: WeatherForecast
+                val apiManager = ApiManager()
+                apiManager.setWeatherUriByCords(location.latitude, location.longitude)
+                runBlocking {
+                    var body = Fuel.get(apiManager.getApiUri()).body
+                    weatherForecast = Gson().fromJson(body, WeatherForecast::class.java)
+                }
+                if (weatherForecast.city.name == ""){
+                    Toast.makeText(
+                        context,
+                        "Brak danych pogodowych dla podanej lokalizacji!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return null
+                }
+                return weatherForecast
+            } else {
+                Toast.makeText(
+                    context,
+                    "Nie można uzyskać aktualnej lokalizacji",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            return null
+        }
+
+        fun getLocationForecastByCityName(cityName: String, context: Context): WeatherForecast?{
+            if (cityName != "") {
+                var weatherForecast: WeatherForecast
+                val apiManager = ApiManager()
+                apiManager.setForecastUri(cityName)
+
+                runBlocking {
+                    val body = Fuel.get(apiManager.getForecastUri()).body
+                    weatherForecast = Gson().fromJson(body, WeatherForecast::class.java)
+                }
+                if (weatherForecast.city.name == ""){
+                    Toast.makeText(
+                        context,
+                        "Brak danych pogodowych dla podanej lokalizacji!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return null
+                }
+                return weatherForecast
 
             } else {
                 Toast.makeText(

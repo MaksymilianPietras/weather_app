@@ -14,7 +14,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
-import fuel.get
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.ZoneOffset
@@ -86,7 +85,7 @@ class BasicDataFragment : Fragment() {
         requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
         val apiManager = ApiManager()
-        apiManager.setWeatherUri(weatherData.weather[0].icon)
+        apiManager.setWeatherUriByCityName(weatherData.weather[0].icon)
         runBlocking {
             val imageView = ImageView(requireContext())
             Picasso.get()
