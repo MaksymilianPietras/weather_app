@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
 
-        val fragmentList = listOf(BasicDataFragment(), CitiesFragment(), WindFragment())
+        val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment())
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
 
@@ -130,8 +130,14 @@ class MainActivity : AppCompatActivity() {
         fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
             val weatherData = getLocationDataByCityCords(location, context)
             if (weatherData != null){
+                WindFragment.newInstance(weatherData)
+
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
-                (viewPagerAdapter.getFragmentAtPosition(2) as WindFragment).setLocationAdditionalInfo(weatherData)
+                if (viewPagerAdapter.itemCount > 2){
+                    WindFragment.setLocationAdditionalInfo(weatherData, viewPagerAdapter.getFragmentAtPosition(2).requireView())
+                } else {
+                    viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
+                }
             }
 
         }
@@ -140,7 +146,11 @@ class MainActivity : AppCompatActivity() {
             val weatherData = getLocationDataByCityName(cityName, context)
             if (weatherData != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
-                (viewPagerAdapter.getFragmentAtPosition(2) as WindFragment).setLocationAdditionalInfo(weatherData)
+                if (viewPagerAdapter.itemCount > 2){
+                    WindFragment.setLocationAdditionalInfo(weatherData, viewPagerAdapter.getFragmentAtPosition(2).requireView())
+                } else {
+                    viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
+                }
             }
             return weatherData
         }
@@ -212,7 +222,7 @@ class MainActivity : AppCompatActivity() {
 
 
     inner class ViewPagerAdapter(
-        private val fragmentList: List<Fragment>,
+        private val fragmentList: MutableList<Fragment>,
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
@@ -229,9 +239,18 @@ class MainActivity : AppCompatActivity() {
             return fragmentList[position]
         }
 
+        fun setFragmentAtPosition(position: Int, fragment: Fragment){
+            fragmentList[position] = fragment
+        }
+
         fun setCurrentItem(position: Int){
             findViewById<ViewPager2>(R.id.viewPager).currentItem = position
         }
+
+        fun addFragmentToViewPager(fragment: Fragment){
+            fragmentList.add(fragment);
+        }
+
 
     }
 }

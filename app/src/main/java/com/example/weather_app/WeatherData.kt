@@ -18,6 +18,14 @@ class WeatherData{
         this.wind.deg = deg
     }
 
+    constructor(windSpeed: Double, windDeg: Int, humidity: Int, visibility: Int, pressure: Double){
+        this.wind.speed = windSpeed
+        this.wind.deg = windDeg
+        this.main.humidity = humidity
+        this.visibility = visibility
+        this.main.pressure = pressure
+    }
+
     constructor()
 
     var name: String = ""
