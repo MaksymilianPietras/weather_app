@@ -13,4 +13,7 @@
     <dimen name="trash_image_padding_left_right">20dp</dimen>
     <dimen name="additional_info_2_elements_text_margin">15dp</dimen>
     <dimen name="additional_info_3_elements_text_margin">6dp</dimen>
+    <dimen name="forecast_default_info_text_size">8sp</dimen>
+    <dimen name="forecast_header_info_text_size">12sp</dimen>
+    <dimen name="forecast_block_margin">20dp</dimen>
 </resources>

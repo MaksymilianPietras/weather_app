@@ -131,13 +131,19 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         fun setLocationDataByCords(location: android.location.Location?, context: Context, viewPagerAdapter: ViewPagerAdapter){
+            if (location == null){
+                return
+            }
             val weatherData = getLocationDataByCityCords(location, context)
             val weatherForecast = getLocationForecastByCityCords(location, context)
             if (weatherData != null && weatherForecast != null){
-                WindFragment.newInstance(weatherData)
 
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
                 setAdditionalInfoFragment(viewPagerAdapter, weatherData)
+                val apiManager = ApiManager()
+                apiManager.setForecastUriByCords(location.latitude, location.longitude)
+
+                setForecastFragment(viewPagerAdapter, weatherForecast, apiManager.getForecastUri())
             }
 
         }
@@ -148,7 +154,10 @@ class MainActivity : AppCompatActivity() {
             if (weatherData != null && weatherForecast != null){
                 (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
                 setAdditionalInfoFragment(viewPagerAdapter, weatherData)
-                setForecastFragment(viewPagerAdapter, weatherForecast)
+                val apiManager = ApiManager()
+                apiManager.setForecastUri(cityName)
+
+                setForecastFragment(viewPagerAdapter, weatherForecast, apiManager.getForecastUri())
             }
             return weatherData
         }
@@ -168,18 +177,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun setForecastFragment(
+        private fun setForecastFragment(
             viewPagerAdapter: ViewPagerAdapter,
             weatherForecast: WeatherForecast,
+            weatherApiUri: String
         ) {
             if (viewPagerAdapter.itemCount > 3) {
                 WeatherForecastFragment.setForecastInfo(
                     weatherForecast,
                     viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-                        .requireView()
+                        .requireView(),
+                    weatherApiUri
                 )
             } else {
-                viewPagerAdapter.addFragmentToViewPager(WeatherForecastFragment.newInstance(weatherForecast))
+                viewPagerAdapter.addFragmentToViewPager(WeatherForecastFragment.newInstance(weatherForecast, weatherApiUri))
             }
         }
 
@@ -244,9 +255,9 @@ class MainActivity : AppCompatActivity() {
             if (location != null) {
                 var weatherForecast: WeatherForecast
                 val apiManager = ApiManager()
-                apiManager.setWeatherUriByCords(location.latitude, location.longitude)
+                apiManager.setForecastUriByCords(location.latitude, location.longitude)
                 runBlocking {
-                    var body = Fuel.get(apiManager.getApiUri()).body
+                    val body = Fuel.get(apiManager.getForecastUri()).body
                     weatherForecast = Gson().fromJson(body, WeatherForecast::class.java)
                 }
                 if (weatherForecast.city.name == ""){

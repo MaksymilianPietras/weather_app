@@ -17,7 +17,7 @@ class ApiManager {
         iconUri = WEATHER_ICON_BASE_URI + code + WEATHER_ICON_SUFFIX_URI
     }
 
-    fun setWeatherUriByCords(lat: Double, lon: Double){
+    fun setForecastUriByCords(lat: Double, lon: Double){
         forecastApiUrl = "$FORECAST_API_BASE?lat$lat&lon=$lon&appid=$API_KEY"
     }
 
