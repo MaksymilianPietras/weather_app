@@ -60,6 +60,7 @@ class WeatherForecastFragment : Fragment() {
 
         fun setForecastInfo(weatherForecast: WeatherForecast, view: View){
             val mainContainer = view.findViewById<LinearLayout>(R.id.mainContainer)
+            mainContainer.removeAllViews()
             weatherForecast.list.forEach { element ->
                 val forecastDataBlock = LinearLayout(view.context)
                 forecastDataBlock.orientation = LinearLayout.HORIZONTAL
@@ -136,8 +137,6 @@ class WeatherForecastFragment : Fragment() {
                 layoutParams.height = (screenHeight * 0.2).toInt()
                 imageView.layoutParams = layoutParams
                 weatherMainData.addView(imageView)
-
-
 
             }
             return weatherMainData
