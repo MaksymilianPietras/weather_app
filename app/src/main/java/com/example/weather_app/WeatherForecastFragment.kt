@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.view.children
 import androidx.core.view.marginTop
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
@@ -84,6 +85,36 @@ class WeatherForecastFragment : Fragment() {
             }
 
         }
+
+        fun switchTemperatureUnit(view: View){
+
+            view.findViewById<LinearLayout>(R.id.mainContainer).children.forEach { child ->
+                if (child is LinearLayout) {
+                    val avgTemp = child.findViewById<TextView>(R.id.avgTemp)
+                    val minTemp = child.findViewById<TextView>(R.id.minTemp)
+                    val maxTemp = child.findViewById<TextView>(R.id.maxTemp)
+
+                    avgTemp.text = Configuration.convertTemperatureByLetter(avgTemp.text.substring(0, avgTemp.text.indexOf("°")).toDouble(),
+                        avgTemp.text.substring(avgTemp.text.indexOf("°") + 1), Configuration.getTemperatureUnit().name)
+                        .toString() + "°${Configuration.getTemperatureUnit().name}"
+
+                    minTemp.text = convertTemperatureFromRange(minTemp, "MIN: ")
+                    maxTemp.text = convertTemperatureFromRange(maxTemp, "MAX: ")
+
+
+                }
+            }
+
+        }
+
+        private fun convertTemperatureFromRange(temp: TextView, label: String) =
+            label + Configuration.convertTemperatureByLetter(
+                temp.text.substring(temp.text.indexOf(" "), temp.text.indexOf("°"))
+                    .toDouble(),
+                temp.text.substring(temp.text.indexOf("°") + 1),
+                Configuration.getTemperatureUnit().name
+            )
+                .toString() + "°${Configuration.getTemperatureUnit().name}"
 
         private fun setForecastDataBlockParams(
             view: View,
@@ -165,18 +196,23 @@ class WeatherForecastFragment : Fragment() {
             dataSubBlock.addView(time)
 
             val avgTemp = TextView(view.context)
-            avgTemp.text = forecastItem.main.temp.toString()
+            avgTemp.text = Configuration.convertTemperatureByLetter(forecastItem.main.temp, "K", Configuration.getTemperatureUnit().name).toString() + "°${Configuration.getTemperatureUnit().name}"
+                .toString()
             avgTemp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
+            avgTemp.id = R.id.avgTemp
             dataSubBlock.addView(avgTemp)
 
             val minTemp = TextView(view.context)
-            minTemp.text = "MIN: ${forecastItem.main.temp_min}"
+            minTemp.text = "MIN: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_min, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
             minTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            minTemp.id = R.id.minTemp
             dataSubBlock.addView(minTemp)
 
             val maxTemp = TextView(view.context)
-            maxTemp.text = "MAX: ${forecastItem.main.temp_max}"
+            maxTemp.text = "MAX: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_max, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
             maxTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            maxTemp.id = R.id.maxTemp
+            dataSubBlock.tag = "forecastData"
             dataSubBlock.addView(maxTemp)
             return dataSubBlock
         }

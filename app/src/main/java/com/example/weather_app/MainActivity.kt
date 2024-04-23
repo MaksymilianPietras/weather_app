@@ -24,8 +24,8 @@ import com.google.gson.Gson
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-private const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
-private const val FORECAST_FRAGMENT_INDEX = 3
+const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
+const val FORECAST_FRAGMENT_INDEX = 3
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient

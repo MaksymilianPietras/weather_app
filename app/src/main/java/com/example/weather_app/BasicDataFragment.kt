@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
@@ -50,6 +51,13 @@ class BasicDataFragment : Fragment() {
 
             requireView().findViewById<TextView>(R.id.temperature).text = Configuration.getTemperature(currentTemp.substring(0, currentTemp.indexOf("°")).toDouble(),
                 Configuration.getTemperatureUnit().prev())
+            val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+
+            adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX).view?.let { it1 ->
+                WeatherForecastFragment.switchTemperatureUnit(
+                    it1
+                )
+            }
 
         }
     }
