@@ -186,8 +186,7 @@ class MainActivity : AppCompatActivity() {
                 WeatherForecastFragment.setForecastInfo(
                     weatherForecast,
                     viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-                        .requireView(),
-                    weatherApiUri
+                        .requireView()
                 )
             } else {
                 viewPagerAdapter.addFragmentToViewPager(WeatherForecastFragment.newInstance(weatherForecast, weatherApiUri))

@@ -1,6 +1,5 @@
 package com.example.weather_app
 
-import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -11,14 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.marginTop
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
-import kotlin.math.min
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 
 class WeatherForecastFragment : Fragment() {
@@ -26,9 +25,7 @@ class WeatherForecastFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
 
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -38,7 +35,7 @@ class WeatherForecastFragment : Fragment() {
             val weatherForecast: WeatherForecast? = arguments?.getParcelable("WeatherForecast") as WeatherForecast?
             val apiUri = arguments?.getString("forecastUri")
             if (apiUri != null && weatherForecast != null) {
-                setForecastInfo(weatherForecast, view, apiUri)
+                setForecastInfo(weatherForecast, view)
             }
         }
     }
@@ -61,11 +58,11 @@ class WeatherForecastFragment : Fragment() {
             return fragment
         }
 
-        fun setForecastInfo(weatherForecast: WeatherForecast, view: View, weatherForecastApiUri: String){
+        fun setForecastInfo(weatherForecast: WeatherForecast, view: View){
             val mainContainer = view.findViewById<LinearLayout>(R.id.mainContainer)
             weatherForecast.list.forEach { element ->
                 val forecastDataBlock = LinearLayout(view.context)
-                forecastDataBlock.orientation = LinearLayout.VERTICAL
+                forecastDataBlock.orientation = LinearLayout.HORIZONTAL
 
                 val layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -74,7 +71,7 @@ class WeatherForecastFragment : Fragment() {
 
                 setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
 
-                val tempRangeSubBlock = createTempRangeSubBlock(view, element, weatherForecastApiUri)
+                val tempRangeSubBlock = createDataSubBlock(view, element, weatherForecast.city.timezone)
                 val weatherMainData = weatherForecastMainData(view, element)
 
 
@@ -119,45 +116,75 @@ class WeatherForecastFragment : Fragment() {
             val weatherMainData = LinearLayout(view.context)
             weatherMainData.orientation = LinearLayout.HORIZONTAL
             weatherMainData.gravity = Gravity.CENTER
-            val temp = TextView(view.context)
-            temp.text = element.main.temp.toString()
-            weatherMainData.addView(temp)
-            temp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
-
-            val weather = TextView(view.context)
-            weather.text = element.weather[0].main
-            weather.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
-            weatherMainData.addView(weather)
-            return weatherMainData
-        }
-
-        private fun createTempRangeSubBlock(
-            view: View,
-            forecastItem: WeatherForecast.ForecastItem,
-            weatherForecastApiUri: String
-        ): LinearLayout {
-            val tempRangeSubBlock = LinearLayout(view.context)
-            tempRangeSubBlock.orientation = LinearLayout.HORIZONTAL
-            tempRangeSubBlock.gravity = Gravity.CENTER
-
-            val minTemp = TextView(view.context)
-            minTemp.text = forecastItem.main.temp_min.toString()
-            minTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
-
-            tempRangeSubBlock.addView(minTemp)
+            val apiManager = ApiManager()
+            apiManager.setWeatherUriByCityName(element.weather[0].icon)
 
             runBlocking {
                 val imageView = ImageView(view.context)
                 Picasso.get()
-                    .load(weatherForecastApiUri)
+                    .load(apiManager.getWeatherUri())
                     .into(imageView)
+
+                val layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                val screenWidth = view.resources.displayMetrics.widthPixels
+                val screenHeight = view.resources.displayMetrics.heightPixels
+
+                layoutParams.width = (screenWidth * 0.7).toInt()
+                layoutParams.height = (screenHeight * 0.2).toInt()
+                imageView.layoutParams = layoutParams
+                weatherMainData.addView(imageView)
+
+
+
             }
+            return weatherMainData
+        }
+
+        private fun createDataSubBlock(
+            view: View,
+            forecastItem: WeatherForecast.ForecastItem,
+            timezone: Long = 0
+        ): LinearLayout {
+            val dataSubBlock = LinearLayout(view.context)
+            dataSubBlock.orientation = LinearLayout.VERTICAL
+            dataSubBlock.gravity = Gravity.CENTER
+
+            var zonedDateTime = convertUnixTimestampToUtc(forecastItem.dt)
+            zonedDateTime = zonedDateTime.plusSeconds(timezone)
+            val date = TextView(view.context)
+            date.text = String.format("Date: %02d.%02d.%d", zonedDateTime.dayOfMonth, zonedDateTime.monthValue, zonedDateTime.year)
+            date.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+
+            dataSubBlock.addView(date)
+
+            val time = TextView(view.context)
+            time.text = String.format("Time: %02d:%02d", zonedDateTime.hour, zonedDateTime.minute)
+            time.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            dataSubBlock.addView(time)
+
+            val avgTemp = TextView(view.context)
+            avgTemp.text = forecastItem.main.temp.toString()
+            avgTemp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
+            dataSubBlock.addView(avgTemp)
+
+            val minTemp = TextView(view.context)
+            minTemp.text = "MIN: ${forecastItem.main.temp_min}"
+            minTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            dataSubBlock.addView(minTemp)
 
             val maxTemp = TextView(view.context)
-            maxTemp.text = forecastItem.main.temp_max.toString()
+            maxTemp.text = "MAX: ${forecastItem.main.temp_max}"
             maxTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
-            tempRangeSubBlock.addView(maxTemp)
-            return tempRangeSubBlock
+            dataSubBlock.addView(maxTemp)
+            return dataSubBlock
+        }
+
+        fun convertUnixTimestampToUtc(unixTimestamp: Long): ZonedDateTime {
+            val instant = Instant.ofEpochSecond(unixTimestamp)
+            return ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"))
         }
     }
 }

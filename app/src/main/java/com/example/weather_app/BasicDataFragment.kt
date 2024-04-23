@@ -63,7 +63,7 @@ class BasicDataFragment : Fragment() {
     fun setWeatherData(weatherData: WeatherData, timerEnable: Boolean){
         requireView().findViewById<TextView>(R.id.city).text = weatherData.name
         requireView().findViewById<TextView>(R.id.geoCords).text =
-            "${weatherData?.coord?.lat}° szer. geogr. ${weatherData?.coord?.lon}° dł. geogr."
+            "${weatherData?.coord?.lat}° lat. ${weatherData?.coord?.lon}° lon."
         requireView().findViewById<TextView>(R.id.temperature).text =
             weatherData.main.temp.let { Configuration.getTemperature(it, Configuration.getTemperatureUnit()) }
 

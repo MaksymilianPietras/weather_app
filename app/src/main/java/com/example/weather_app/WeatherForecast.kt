@@ -15,7 +15,7 @@ class WeatherForecast() : Parcelable{
 
     inner class City{
         var name: String = ""
-        var timeZone: Int = 0
+        var timezone: Long = 0
     }
 
     inner class ForecastItem{
