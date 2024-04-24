@@ -49,8 +49,11 @@ class WeatherForecastFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(weatherForecast: WeatherForecast, forecastApiUri: String): WeatherForecastFragment {
+        fun newInstance(weatherForecast: WeatherForecast?, forecastApiUri: String?): WeatherForecastFragment {
             val fragment = WeatherForecastFragment()
+            if (weatherForecast == null || forecastApiUri == null){
+                return fragment
+            }
             val args = Bundle().apply {
                 putParcelable("WeatherForecast", weatherForecast)
                 putString("forecastUri", forecastApiUri)
@@ -197,7 +200,6 @@ class WeatherForecastFragment : Fragment() {
 
             val avgTemp = TextView(view.context)
             avgTemp.text = Configuration.convertTemperatureByLetter(forecastItem.main.temp, "K", Configuration.getTemperatureUnit().name).toString() + "°${Configuration.getTemperatureUnit().name}"
-                .toString()
             avgTemp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
             avgTemp.id = R.id.avgTemp
             dataSubBlock.addView(avgTemp)

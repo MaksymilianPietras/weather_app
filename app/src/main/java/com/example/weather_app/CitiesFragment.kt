@@ -48,7 +48,7 @@ class CitiesFragment : Fragment() {
             return
         }
 
-        val fileContentJsonList = readCitiesDataFromInternalStorage(requireActivity())
+        val fileContentJsonList = FileManager.readCitiesDataFromInternalStorage(requireActivity())
         val citiesDataRefreshTime = fileContentJsonList.map {
             city ->
             getCityNameAndLastUpdateDateFromRow(city)
@@ -71,12 +71,12 @@ class CitiesFragment : Fragment() {
 
                 val weatherData = MainActivity.getLocationDataByCityName(singleCityData[0], requireContext())
                 if (weatherData != null) {
-                    removeCityFromInternalStorage(singleCityData[0], requireActivity())
+                    FileManager.removeCityFromInternalStorage(singleCityData[0], requireActivity())
                     val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                     val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                     weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
                     weatherData.formattedGettingDataTime =  String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
-                    saveCityDataToInternalStorage(weatherData, requireActivity())
+                    FileManager.saveCityDataToInternalStorage(weatherData, requireActivity())
                 }
             }
         }
@@ -100,9 +100,9 @@ class CitiesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val fileContent = readCitiesDataFromInternalStorage(requireActivity())
+        val fileContent = FileManager.readCitiesDataFromInternalStorage(requireActivity())
         if (fileContent.isNotEmpty()){
-            val splittedCities = getCitiesNamesFromFileContent(fileContent)
+            val splittedCities = FileManager.getCitiesNamesFromFileContent(fileContent)
 
             splittedCities.forEach {cityName ->
                 createFavouriteCityBtn(cityName, view)
@@ -112,7 +112,7 @@ class CitiesFragment : Fragment() {
         requireView().findViewById<ImageButton>(R.id.addCityBtn).setOnClickListener {
             var newCity = requireView().findViewById<EditText>(R.id.cityNameText).text.toString()
             newCity = newCity.trim()
-            val cities = readCitiesDataFromInternalStorage(requireActivity())
+            val cities = FileManager.readCitiesDataFromInternalStorage(requireActivity())
 
             if (!fileContainsCity(newCity, cities)){
                 val weatherData = MainActivity.getLocationDataByCityName(newCity, requireContext())
@@ -121,7 +121,7 @@ class CitiesFragment : Fragment() {
                     val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                     weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
                     weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
-                    saveCityDataToInternalStorage(weatherData, requireActivity())
+                    FileManager.saveCityDataToInternalStorage(weatherData, requireActivity())
                     createFavouriteCityBtn(newCity, view)
                     Toast.makeText(
                         context,
@@ -174,7 +174,7 @@ class CitiesFragment : Fragment() {
         cityBtn.setOnClickListener {
             Configuration.setTemperatureUnit(TemperatureUnit.K)
 
-            val fileContent = readCitiesDataFromInternalStorage(requireActivity())
+            val fileContent = FileManager.readCitiesDataFromInternalStorage(requireActivity())
             var lastUpdateTimeDifference = 0L
 
             if (BasicDataFragment.timeCounterSchedulerActive){
@@ -205,12 +205,12 @@ class CitiesFragment : Fragment() {
 
 
                 } else {
-                    setCityDataFromFileLines(fileContent, cityName, adapter, true)
+                    FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, true)
 
                 }
 
             } else {
-                setCityDataFromFileLines(fileContent, cityName, adapter, false)
+                FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, false)
                 adapter.getFragmentAtPosition(0).requireView().findViewById<TextView>(R.id.city).text =
                     "$cityName (Przestarzałe dane)"
             }
@@ -237,7 +237,7 @@ class CitiesFragment : Fragment() {
 
         deleteCityBtn.setOnClickListener {
             val city = cityBtn.text.toString()
-            removeCityFromInternalStorage(city, requireActivity())
+            FileManager.removeCityFromInternalStorage(city, requireActivity())
             view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).removeView(cityLabel)
         }
 
@@ -256,95 +256,20 @@ class CitiesFragment : Fragment() {
             context: Context,
             activity: FragmentActivity
         ) {
-            val weatherData =
-                MainActivity.setLocationDataByCityName(cityName, context, adapter, startTimerCounter)
-            if (weatherData != null) {
-                removeCityFromInternalStorage(cityName, activity)
+            val citiesData = MainActivity.setLocationDataByCityName(cityName, context, adapter, startTimerCounter)
+            val weatherData = citiesData[0] as WeatherData?
+            val weatherForecast = citiesData[1] as WeatherForecast?
+            if (weatherData != null && weatherForecast != null) {
+                FileManager.removeCityFromInternalStorage(cityName, activity)
                 val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                 val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                 weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
                 weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
-                saveCityDataToInternalStorage(weatherData, activity)
+                FileManager.saveCityDataToInternalStorage(weatherData, activity)
+                FileManager.saveCityForecastToInternalStorage(weatherForecast, activity)
             }
         }
 
-        fun setCityDataFromFileLines(
-            citiesData: List<WeatherData>,
-            cityName: String,
-            adapter: MainActivity.ViewPagerAdapter,
-            timerEnable: Boolean
-        ) {
-            for (cityData in citiesData) {
-                if (cityData.name == cityName) {
-                    (adapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(
-                        cityData,
-                        timerEnable
-                    )
-                    MainActivity.setAdditionalInfoFragment(adapter, cityData, )
-                    break
-                }
-            }
-        }
-
-        fun removeCityFromInternalStorage(city: String, activity: FragmentActivity) {
-            var fileContent = readCitiesDataFromInternalStorage(activity)
-            fileContent = fileContent.filter { it.name != city }
-            val parsedFileContent = Gson().toJson(fileContent)
-            val internalStorage = "weather_data.txt"
-            val fileOutputStream: FileOutputStream =
-                activity.openFileOutput(internalStorage, AppCompatActivity.MODE_PRIVATE)
-            fileOutputStream.bufferedWriter().use { it.write(parsedFileContent) }
-            fileOutputStream.close()
-        }
-
-        fun getCitiesNamesFromFileContent(weathersData: List<WeatherData>): List<String> {
-            val splittedCities = ArrayList<String>()
-            for (weatherData in weathersData){
-                splittedCities.add(weatherData.name)
-            }
-            return splittedCities
-        }
-
-
-        fun readCitiesDataFromInternalStorage(activity: FragmentActivity): List<WeatherData> {
-            val internalStorage = "weather_data.txt"
-            val fileContent: String
-            var citiesData: List<WeatherData> = ArrayList()
-            try {
-
-                val inputStream: FileInputStream = activity.openFileInput(internalStorage)
-                fileContent = inputStream.bufferedReader().use { it.readText() }
-                val typeToken = object : TypeToken<List<WeatherData>>() {}.type
-                if (fileContent != ""){
-                    citiesData = Gson().fromJson(fileContent, typeToken)
-
-                }
-
-                inputStream.close()
-            } catch (_: FileNotFoundException) {}
-
-            return citiesData
-        }
-
-        fun saveCityDataToInternalStorage(
-            weatherData: WeatherData,
-            activity: FragmentActivity
-        ) {
-
-            val citiesData = readCitiesDataFromInternalStorage(activity)
-            val internalStorage = "weather_data.txt"
-            val outputStream: FileOutputStream = activity.openFileOutput(internalStorage,
-                AppCompatActivity.MODE_PRIVATE
-            )
-
-            val newFileContent = citiesData.toMutableList()
-            newFileContent.add(weatherData)
-            val contentToSave = Gson().toJson(newFileContent)
-
-            outputStream.bufferedWriter().use { it.write(contentToSave) }
-
-            outputStream.close()
-        }
     }
 
 }

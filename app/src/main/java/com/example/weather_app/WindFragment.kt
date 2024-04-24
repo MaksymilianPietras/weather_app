@@ -37,8 +37,11 @@ class WindFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(weatherData: WeatherData): WindFragment {
+        fun newInstance(weatherData: WeatherData?): WindFragment {
             val fragment = WindFragment()
+            if (weatherData == null){
+                return fragment
+            }
             val args = Bundle().apply {
                 putDouble("windSpeed", weatherData.wind.speed)
                 putInt("windDeg", weatherData.wind.deg)

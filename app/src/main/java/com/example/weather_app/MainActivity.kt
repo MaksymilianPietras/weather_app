@@ -21,6 +21,7 @@ import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.runBlocking
 import com.google.gson.Gson
+import java.io.FileOutputStream
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -48,13 +49,13 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
 
-        val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment())
+        val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment(), WindFragment(), WeatherForecastFragment())
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
 
         //TODO naprawić włączanie timera bo daje niepełne info i sie wiesza
-        val fileData = CitiesFragment.readCitiesDataFromInternalStorage(this)
-        val citiesNames = CitiesFragment.getCitiesNamesFromFileContent(fileData)
+        val fileData = FileManager.readCitiesDataFromInternalStorage(this)
+        val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
         createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter)
 
     }
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): WeatherData?{
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): List<Any?>{
             val weatherData = getLocationDataByCityName(cityName, context)
             val weatherForecast = getLocationForecastByCityName(cityName, context)
             if (weatherData != null && weatherForecast != null){
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
                 setForecastFragment(viewPagerAdapter, weatherForecast, apiManager.getForecastUri())
             }
-            return weatherData
+            return listOf(weatherData, weatherForecast)
         }
 
         fun setAdditionalInfoFragment(
