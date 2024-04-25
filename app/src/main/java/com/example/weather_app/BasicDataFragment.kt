@@ -15,6 +15,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.ZoneOffset
@@ -80,7 +83,7 @@ class BasicDataFragment : Fragment() {
         if (timerEnable){
             timeCounterScheduler = Executors.newScheduledThreadPool(1)
             timeCounterSchedulerActive = true
-            val timeCounter = Runnable {
+                val timeCounter = Runnable {
                 zonedDateTime = getTimeForPlace(weatherData)
                 zonedDateTime = zonedDateTime?.plusSeconds(1)
                 requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
@@ -94,7 +97,7 @@ class BasicDataFragment : Fragment() {
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
         val apiManager = ApiManager()
         apiManager.setWeatherUriByCityName(weatherData.weather[0].icon)
-        runBlocking {
+        CoroutineScope(Dispatchers.Main).launch {
             val imageView = ImageView(requireContext())
             Picasso.get()
                 .load(apiManager.getWeatherUri())

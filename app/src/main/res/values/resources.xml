@@ -3,4 +3,6 @@
     <item type="id" name="avgTemp" />
     <item type="id" name="minTemp" />
     <item type="id" name="maxTemp" />
+    <item type="id" name="windFragment" />
+    <item type="id" name="forecastFragment" />
 </resources>

@@ -33,9 +33,8 @@ import java.time.temporal.ChronoUnit
 import kotlin.reflect.typeOf
 
 
-private const val SECONDS_TO_REFRESH_CITY_DATA = 15
-
 class CitiesFragment : Fragment() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,11 +83,6 @@ class CitiesFragment : Fragment() {
 
     }
 
-    private fun getCityNameAndLastUpdateDateFromRow(weatherData: WeatherData) =
-        listOf(
-            weatherData.name,
-            weatherData.formattedGettingDataTime
-        )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -199,10 +193,8 @@ class CitiesFragment : Fragment() {
             adapter.getFragmentAtPosition(0).requireView().findViewById<LinearLayout>(R.id.weatherMainData).removeAllViews()
 
             if (MainActivity.isNetworkAvailable(requireContext())){
-
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
                     updateCityData(cityName, adapter, true, requireContext(), requireActivity())
-
 
                 } else {
                     FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, true)
@@ -249,6 +241,8 @@ class CitiesFragment : Fragment() {
 
 
     companion object {
+        const  val SECONDS_TO_REFRESH_CITY_DATA = 15
+
         fun updateCityData(
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
@@ -269,6 +263,11 @@ class CitiesFragment : Fragment() {
                 FileManager.saveCityForecastToInternalStorage(weatherForecast, activity)
             }
         }
+        fun getCityNameAndLastUpdateDateFromRow(weatherData: WeatherData) =
+            listOf(
+                weatherData.name,
+                weatherData.formattedGettingDataTime
+            )
 
     }
 

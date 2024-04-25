@@ -16,12 +16,22 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.core.app.ActivityCompat
+
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.location.FusedLocationProviderClient
 import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.runBlocking
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import java.io.FileOutputStream
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -49,14 +59,53 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
 
-        val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment(), WindFragment(), WeatherForecastFragment())
+        val fileData = FileManager.readCitiesDataFromInternalStorage(this)
+        val weatherForecastData = FileManager.readCitiesForecastFromInternalStorage(this)
+
+        var weatherData: WeatherData? = null
+        var weatherForecast: WeatherForecast? = null
+        var apiManager: ApiManager? = null
+
+
+
+        if (fileData.isNotEmpty() && weatherForecastData.isNotEmpty()){
+            val cityData = CitiesFragment.getCityNameAndLastUpdateDateFromRow(fileData[0])
+
+            val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")
+            val localDateTime = LocalDateTime.parse(cityData[1], formatter)
+            val cityRefreshTime = ZonedDateTime.of(localDateTime, ZoneOffset.UTC)
+
+            val lastUpdateTimeDifference = ChronoUnit.SECONDS.between(cityRefreshTime, currentTime)
+
+            if (isNetworkAvailable(this) && lastUpdateTimeDifference > CitiesFragment.SECONDS_TO_REFRESH_CITY_DATA){
+                weatherData = getLocationDataByCityName(fileData[0].name, this)
+                weatherForecast = getLocationForecastByCityName(fileData[0].name, this)
+                apiManager = ApiManager()
+                apiManager.setForecastUri(fileData[0].name)
+                if (weatherData != null && weatherForecast != null){
+                    FileManager.saveCityDataToInternalStorage(weatherData, this)
+                    FileManager.saveCityForecastToInternalStorage(weatherForecast, this)
+                }
+
+            } else {
+                weatherData = FileManager.readCitiesDataFromInternalStorage(this)[0]
+                weatherForecast = FileManager.readCitiesForecastFromInternalStorage(this)[0]
+                apiManager = ApiManager()
+                apiManager.setForecastUri(weatherData.name)
+            }
+
+        }
+
+
+        val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment(), WindFragment.newInstance(weatherData), WeatherForecastFragment.newInstance(weatherForecast, apiManager?.getForecastUri()))
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
 
         //TODO naprawić włączanie timera bo daje niepełne info i sie wiesza
-        val fileData = FileManager.readCitiesDataFromInternalStorage(this)
+
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
-        createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter)
+        createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter, this, this)
 
     }
 
@@ -75,31 +124,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ),
             1
-        )
-    }
-
-    private fun createGettingFavouriteCityDataRoutine(
-        citiesNames: List<String>,
-        adapter: MainActivity.ViewPagerAdapter,
-    ) {
-        val scheduler = Executors.newScheduledThreadPool(1)
-
-        val refreshCityDataTask = Runnable {
-            if (isNetworkAvailable(this)){
-                for (city in citiesNames){
-                    CitiesFragment.updateCityData(city, adapter, false, this, this)
-                }
-                Toast.makeText(
-                    this,
-                    "Zakutalizowano dane o miastach",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        scheduler.scheduleAtFixedRate(
-            refreshCityDataTask, 0,
-            1, TimeUnit.SECONDS
         )
     }
 
@@ -149,6 +173,33 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        fun createGettingFavouriteCityDataRoutine(
+            citiesNames: List<String>,
+            adapter: MainActivity.ViewPagerAdapter,
+            context: Context,
+            activity: AppCompatActivity
+        ) {
+            val scheduler = Executors.newScheduledThreadPool(1)
+
+            val refreshCityDataTask = Runnable {
+                if (isNetworkAvailable(context)){
+                    for (city in citiesNames){
+                        CitiesFragment.updateCityData(city, adapter, false, context, activity)
+                    }
+                    Toast.makeText(
+                        context,
+                        "Zakutalizowano dane o miastach",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            scheduler.scheduleAtFixedRate(
+                refreshCityDataTask, 0,
+                1, TimeUnit.SECONDS
+            )
+        }
+
         fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): List<Any?>{
             val weatherData = getLocationDataByCityName(cityName, context)
             val weatherForecast = getLocationForecastByCityName(cityName, context)
@@ -163,16 +214,19 @@ class MainActivity : AppCompatActivity() {
             return listOf(weatherData, weatherForecast)
         }
 
+
         fun setAdditionalInfoFragment(
             viewPagerAdapter: ViewPagerAdapter,
             weatherData: WeatherData,
         ) {
             if (viewPagerAdapter.itemCount > 2) {
-                WindFragment.setLocationAdditionalInfo(
-                    weatherData,
-                    viewPagerAdapter.getFragmentAtPosition(ADDITIONAL_INFO_FRAGMENT_INDEX)
-                        .requireView()
-                )
+                val windFragment = viewPagerAdapter.getFragmentAtPosition(ADDITIONAL_INFO_FRAGMENT_INDEX)
+
+                windFragment.lifecycleScope.launch {
+                    windFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        WindFragment.setLocationAdditionalInfo(weatherData, windFragment.requireView())
+                    }
+                }
             } else {
                 viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
             }
@@ -184,11 +238,18 @@ class MainActivity : AppCompatActivity() {
             weatherApiUri: String
         ) {
             if (viewPagerAdapter.itemCount > 3) {
+                val forecastFragment = viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
                 WeatherForecastFragment.setForecastInfo(
                     weatherForecast,
                     viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
                         .requireView()
                 )
+
+                forecastFragment.lifecycleScope.launch {
+                    forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
+                    }
+                }
             } else {
                 viewPagerAdapter.addFragmentToViewPager(WeatherForecastFragment.newInstance(weatherForecast, weatherApiUri))
             }
@@ -346,6 +407,8 @@ class MainActivity : AppCompatActivity() {
         fun addFragmentToViewPager(fragment: Fragment){
             fragmentList.add(fragment);
         }
+
+
 
 
     }
