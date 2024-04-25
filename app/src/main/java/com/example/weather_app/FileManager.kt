@@ -14,13 +14,11 @@ class FileManager {
             citiesData: List<WeatherData>,
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
-            timerEnable: Boolean
         ) {
             for (cityData in citiesData) {
                 if (cityData.name == cityName) {
                     (adapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(
                         cityData,
-                        timerEnable
                     )
                     MainActivity.setAdditionalInfoFragment(adapter, cityData)
                     break

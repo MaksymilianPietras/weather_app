@@ -173,11 +173,6 @@ class CitiesFragment : Fragment() {
             val fileContent = FileManager.readCitiesDataFromInternalStorage(requireActivity())
             var lastUpdateTimeDifference = 0L
 
-            if (BasicDataFragment.timeCounterSchedulerActive){
-                BasicDataFragment.timeCounterSchedulerActive = false
-                BasicDataFragment.timeCounterScheduler.shutdown()
-            }
-
             for (city in fileContent){
                 val cityData = getCityNameAndLastUpdateDateFromRow(city)
                 if (cityData[0] == cityBtn.text){
@@ -196,15 +191,15 @@ class CitiesFragment : Fragment() {
 
             if (MainActivity.isNetworkAvailable(requireContext())){
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
-                    updateCityData(cityName, adapter, true, requireContext(), requireActivity())
+                    updateCityData(cityName, adapter, requireContext(), requireActivity())
 
                 } else {
-                    FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, true)
+                    FileManager.setCityDataFromFileLines(fileContent, cityName, adapter)
 
                 }
 
             } else {
-                FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, false)
+                FileManager.setCityDataFromFileLines(fileContent, cityName, adapter)
                 adapter.getFragmentAtPosition(0).requireView().findViewById<TextView>(R.id.city).text =
                     "$cityName (Przestarzałe dane)"
             }
@@ -248,11 +243,10 @@ class CitiesFragment : Fragment() {
         fun updateCityData(
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
-            startTimerCounter: Boolean,
             context: Context,
             activity: FragmentActivity
         ) {
-            val citiesData = MainActivity.setLocationDataByCityName(cityName, context, adapter, startTimerCounter)
+            val citiesData = MainActivity.setLocationDataByCityName(cityName, context, adapter)
             val weatherData = citiesData[0] as WeatherData?
             val weatherForecast = citiesData[1] as WeatherForecast?
             if (weatherData != null && weatherForecast != null) {

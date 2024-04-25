@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             val weatherForecast = getLocationForecastByCityCords(location, context)
             if (weatherData != null && weatherForecast != null){
 
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, true)
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
                 setAdditionalInfoFragment(viewPagerAdapter, weatherData)
                 val apiManager = ApiManager()
                 apiManager.setForecastUriByCords(location.latitude, location.longitude)
@@ -184,27 +184,29 @@ class MainActivity : AppCompatActivity() {
             val refreshCityDataTask = Runnable {
                 if (isNetworkAvailable(context)){
                     for (city in citiesNames){
-                        CitiesFragment.updateCityData(city, adapter, false, context, activity)
+                        CitiesFragment.updateCityData(city, adapter, context, activity)
                     }
-                    Toast.makeText(
-                        context,
-                        "Zakutalizowano dane o miastach",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    activity.runOnUiThread {
+                        Toast.makeText(
+                            context,
+                            "Zaktualizowano dane o miastach",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 
             scheduler.scheduleAtFixedRate(
                 refreshCityDataTask, 0,
-                1, TimeUnit.SECONDS
+                10, TimeUnit.SECONDS
             )
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter, startTimerCounter: Boolean): List<Any?>{
+        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter): List<Any?>{
             val weatherData = getLocationDataByCityName(cityName, context)
             val weatherForecast = getLocationForecastByCityName(cityName, context)
             if (weatherData != null && weatherForecast != null){
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData, startTimerCounter)
+                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
                 setAdditionalInfoFragment(viewPagerAdapter, weatherData)
                 val apiManager = ApiManager()
                 apiManager.setForecastUri(cityName)
@@ -219,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             viewPagerAdapter: ViewPagerAdapter,
             weatherData: WeatherData,
         ) {
-            if (viewPagerAdapter.itemCount > 2) {
+            if (viewPagerAdapter.itemCount > ADDITIONAL_INFO_FRAGMENT_INDEX) {
                 val windFragment = viewPagerAdapter.getFragmentAtPosition(ADDITIONAL_INFO_FRAGMENT_INDEX)
 
                 windFragment.lifecycleScope.launch {
@@ -237,7 +239,7 @@ class MainActivity : AppCompatActivity() {
             weatherForecast: WeatherForecast,
             weatherApiUri: String
         ) {
-            if (viewPagerAdapter.itemCount > 3) {
+            if (viewPagerAdapter.itemCount > FORECAST_FRAGMENT_INDEX) {
                 val forecastFragment = viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
                 forecastFragment.lifecycleScope.launch {
                     forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {

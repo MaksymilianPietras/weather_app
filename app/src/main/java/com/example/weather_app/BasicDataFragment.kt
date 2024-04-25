@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
@@ -29,8 +30,6 @@ import java.util.concurrent.TimeUnit
 
 class BasicDataFragment : Fragment() {
     companion object{
-        var timeCounterSchedulerActive = false
-        var timeCounterScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
 
         fun getTimeForPlace(weatherData: WeatherData): ZonedDateTime? {
             val date = Instant.now()
@@ -71,7 +70,7 @@ class BasicDataFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_basic_data, container, false)
     }
 
-    fun setWeatherData(weatherData: WeatherData, timerEnable: Boolean){
+    fun setWeatherData(weatherData: WeatherData){
         requireView().findViewById<TextView>(R.id.city).text = weatherData.name
         requireView().findViewById<TextView>(R.id.geoCords).text =
             "${weatherData?.coord?.lat}° lat. ${weatherData?.coord?.lon}° lon."
@@ -80,24 +79,13 @@ class BasicDataFragment : Fragment() {
 
         var zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
-        if (timerEnable){
-            timeCounterScheduler = Executors.newScheduledThreadPool(1)
-            timeCounterSchedulerActive = true
-                val timeCounter = Runnable {
-                zonedDateTime = getTimeForPlace(weatherData)
-                zonedDateTime = zonedDateTime?.plusSeconds(1)
-                requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
-            }
-
-            timeCounterScheduler.scheduleAtFixedRate(timeCounter, 0, 1, TimeUnit.SECONDS)
-        }
 
 
         requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
         val apiManager = ApiManager()
         apiManager.setWeatherUriByCityName(weatherData.weather[0].icon)
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             val imageView = ImageView(requireContext())
             Picasso.get()
                 .load(apiManager.getWeatherUri())
@@ -118,16 +106,11 @@ class BasicDataFragment : Fragment() {
             )
             weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
 
-            val weatherDataLayout = LinearLayout(requireContext())
-            weatherDataLayout.gravity = Gravity.CENTER
-            weatherDataLayout.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                resources.getDimensionPixelSize(R.dimen.weather_main_data_layout_height)
-            )
-            weatherDataLayout.background = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.WeatherDataBackgroundColor))
-            weatherDataLayout.addView(imageView)
-            weatherDataLayout.addView(weatherType)
-            requireView().findViewById<LinearLayout>(R.id.weatherMainData).addView(weatherDataLayout)
+            val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
+            //weatherDataLayout?.removeAllViews()
+            weatherDataLayout?.addView(imageView)
+            weatherDataLayout?.addView(weatherType)
+            //TODO NIE DODAJE DO LAYOUTU
         }
     }
 
