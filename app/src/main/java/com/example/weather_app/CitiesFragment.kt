@@ -110,12 +110,14 @@ class CitiesFragment : Fragment() {
 
             if (!fileContainsCity(newCity, cities)){
                 val weatherData = MainActivity.getLocationDataByCityName(newCity, requireContext())
-                if (weatherData != null){
+                val weatherForecast = MainActivity.getLocationForecastByCityName(newCity, requireContext())
+                if (weatherData != null && weatherForecast != null){
                     val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                     val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                     weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
                     weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
                     FileManager.saveCityDataToInternalStorage(weatherData, requireActivity())
+                    FileManager.saveCityForecastToInternalStorage(weatherForecast, requireActivity())
                     createFavouriteCityBtn(newCity, view)
                     Toast.makeText(
                         context,
