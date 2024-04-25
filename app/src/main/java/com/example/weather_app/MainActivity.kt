@@ -239,12 +239,6 @@ class MainActivity : AppCompatActivity() {
         ) {
             if (viewPagerAdapter.itemCount > 3) {
                 val forecastFragment = viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-                WeatherForecastFragment.setForecastInfo(
-                    weatherForecast,
-                    viewPagerAdapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-                        .requireView()
-                )
-
                 forecastFragment.lifecycleScope.launch {
                     forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
