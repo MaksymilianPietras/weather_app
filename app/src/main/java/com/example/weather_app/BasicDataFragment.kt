@@ -1,6 +1,8 @@
 package com.example.weather_app
 
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.Fragment
@@ -83,6 +85,7 @@ class BasicDataFragment : Fragment() {
 
                         weatherKindTextView.textSize = resources.getDimension(R.dimen.weather_type_text_size)
                         weatherKindTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                        setWeatherPaneParams(weatherKindTextView)
 
                         weatherDataLayout?.addView(weatherKindTextView)
                         weatherDataLayout?.addView(weatherIcon)
@@ -168,6 +171,8 @@ class BasicDataFragment : Fragment() {
             weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
             weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
 
+
+
             val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
 
             setIconLayout(weatherIcon)
@@ -175,9 +180,22 @@ class BasicDataFragment : Fragment() {
             weatherDataLayout?.addView(weatherType)
             weatherDataLayout?.addView(weatherIcon)
 
+            setWeatherPaneParams(weatherType)
+
             weatherImgUrl = apiManager.getWeatherUri()
             weatherKind = weatherType.text.toString()
         }
+    }
+
+    private fun setWeatherPaneParams(
+        weatherType: TextView,
+    ) {
+        weatherType.setShadowLayer(
+            5.0F,
+            5.0F,
+            5.0F,
+            ContextCompat.getColor(requireView().context, R.color.black)
+        )
     }
 
     private fun setIconLayout(weatherIcon: ImageView) {
