@@ -12,6 +12,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.marginTop
 import com.squareup.picasso.Picasso
@@ -190,29 +192,34 @@ class WeatherForecastFragment : Fragment() {
             val date = TextView(view.context)
             date.text = String.format("Date: %02d.%02d.%d", zonedDateTime.dayOfMonth, zonedDateTime.monthValue, zonedDateTime.year)
             date.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            date.setTextColor(ContextCompat.getColor(view.context, R.color.white))
 
             dataSubBlock.addView(date)
 
             val time = TextView(view.context)
             time.text = String.format("Time: %02d:%02d", zonedDateTime.hour, zonedDateTime.minute)
             time.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            time.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             dataSubBlock.addView(time)
 
             val avgTemp = TextView(view.context)
             avgTemp.text = Configuration.convertTemperatureByLetter(forecastItem.main.temp, "K", Configuration.getTemperatureUnit().name).toString() + "°${Configuration.getTemperatureUnit().name}"
             avgTemp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
+            avgTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             avgTemp.id = R.id.avgTemp
             dataSubBlock.addView(avgTemp)
 
             val minTemp = TextView(view.context)
             minTemp.text = "MIN: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_min, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
             minTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            minTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             minTemp.id = R.id.minTemp
             dataSubBlock.addView(minTemp)
 
             val maxTemp = TextView(view.context)
             maxTemp.text = "MAX: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_max, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
             maxTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            maxTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             maxTemp.id = R.id.maxTemp
             dataSubBlock.tag = "forecastData"
             dataSubBlock.addView(maxTemp)

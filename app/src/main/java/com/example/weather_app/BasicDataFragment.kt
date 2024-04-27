@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -91,26 +92,30 @@ class BasicDataFragment : Fragment() {
                 .load(apiManager.getWeatherUri())
                 .into(imageView)
 
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0.4f
-            )
+
 
             val weatherType = TextView(requireContext())
             weatherType.text = weatherData.weather[0].main
-            weatherType.layoutParams = LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                0.6f
-            )
+            weatherType.gravity = Gravity.CENTER
+
             weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
+            weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
 
             val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
-            //weatherDataLayout?.removeAllViews()
-            weatherDataLayout?.addView(imageView)
+
+            val widthInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_width)
+            val heightInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_height)
+
+            val layoutParams = LayoutParams(
+                widthInPixels,
+                heightInPixels
+            )
+
+            imageView.layoutParams = layoutParams
+            weatherDataLayout?.removeAllViews()
             weatherDataLayout?.addView(weatherType)
-            //TODO NIE DODAJE DO LAYOUTU
+            weatherDataLayout?.addView(imageView)
+
         }
     }
 

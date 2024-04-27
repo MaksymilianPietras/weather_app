@@ -90,7 +90,7 @@
             android:layout_marginTop="10dp"
             android:background="@color/WeatherDataBackgroundColor"
             android:gravity="center"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.20"
             app:layout_constraintStart_toStartOf="parent"
