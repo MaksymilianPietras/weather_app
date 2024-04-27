@@ -14,23 +14,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.reflect.typeOf
 
 
 class CitiesFragment : Fragment() {
@@ -146,8 +139,9 @@ class CitiesFragment : Fragment() {
     private fun createFavouriteCityBtn(cityName: String, view: View) {
         val cityLabel = LinearLayout(requireContext())
         cityLabel.orientation = LinearLayout.HORIZONTAL
+        val screenWidth = view.resources.displayMetrics.widthPixels
         cityLabel.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
+                (screenWidth * 0.8).toInt(),
                 resources.getDimensionPixelSize(R.dimen.city_label_height)
 
             )
@@ -211,10 +205,11 @@ class CitiesFragment : Fragment() {
         deleteCityBtn.setBackgroundResource(R.drawable.delete_city_background)
         deleteCityBtn.setImageResource(R.drawable.trash)
         deleteCityBtn.scaleType = ImageView.ScaleType.FIT_XY
+        val deleteButtonWidthPercent: Float = setWidthByOrientation()
         deleteCityBtn.layoutParams = LinearLayout.LayoutParams(
             0,
             resources.getDimensionPixelSize(R.dimen.city_label_height) / 2,
-            0.15F
+            deleteButtonWidthPercent
         )
 
         deleteCityBtn.setPadding(
@@ -235,6 +230,15 @@ class CitiesFragment : Fragment() {
         view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).addView(cityLabel)
     }
 
+    private fun setWidthByOrientation(): Float {
+        val deleteButtonWidthPercent: Float =
+            if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                0.1F
+            } else {
+                0.2F
+            }
+        return deleteButtonWidthPercent
+    }
 
 
     companion object {

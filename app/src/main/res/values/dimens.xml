@@ -10,9 +10,10 @@
     <dimen name="city_label_text_max_size">10sp</dimen>
     <dimen name="city_label_text_min_size">5sp</dimen>
     <dimen name="weather_type_text_size">10sp</dimen>
-    <dimen name="labelsMargin">40dp</dimen>
+    <dimen name="labels_margin">40dp</dimen>
     <dimen name="trash_image_padding_top_bottom">15dp</dimen>
     <dimen name="trash_image_padding_left_right">20dp</dimen>
+    <dimen name="cities_scroll_pane_margin_top">20dp</dimen>
     <dimen name="additional_info_2_elements_text_margin">15dp</dimen>
     <dimen name="additional_info_3_elements_text_margin">6dp</dimen>
     <dimen name="forecast_default_info_text_size">5sp</dimen>

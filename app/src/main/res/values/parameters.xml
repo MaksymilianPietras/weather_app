@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="manage_cities_btn_width_percent">0.55</dimen>
+    <dimen name="cities_scroll_pane_height_percent">0.8</dimen>
+    <dimen name="delete_city_btn_width_percent">0.15</dimen>
+</resources>
