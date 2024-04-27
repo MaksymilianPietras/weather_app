@@ -1,7 +1,6 @@
 package com.example.weather_app
 
 
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.Fragment
@@ -14,22 +13,26 @@ import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 
 
 class BasicDataFragment : Fragment() {
+    private var cityName: String = ""
+    private var geoCords: String = ""
+    private var tem: String = ""
+    private var time: String = ""
+    private var pressure: String = ""
+    private var weatherImgUrl: String = ""
+    private var weatherKind: String = ""
     companion object{
 
         fun getTimeForPlace(weatherData: WeatherData): ZonedDateTime? {
@@ -44,7 +47,67 @@ class BasicDataFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (savedInstanceState != null) {
+            lifecycleScope.launch {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    requireView().findViewById<TextView>(R.id.city).text = savedInstanceState.getString("cityName", "")
+                    cityName = savedInstanceState.getString("cityName", "")
+
+                    requireView().findViewById<TextView>(R.id.geoCords).text = savedInstanceState.getString("geoCords", "")
+                    geoCords = savedInstanceState.getString("geoCords", "")
+
+                    requireView().findViewById<TextView>(R.id.temperature).text = savedInstanceState.getString("tem", "")
+                    tem = savedInstanceState.getString("tem", "")
+
+                    requireView().findViewById<TextView>(R.id.time).text = savedInstanceState.getString("time", "")
+                    time = savedInstanceState.getString("time", "")
+
+                    requireView().findViewById<TextView>(R.id.pressure).text = savedInstanceState.getString("pressure", "")
+                    pressure = savedInstanceState.getString("pressure", "")
+
+                    weatherImgUrl = savedInstanceState.getString("weatherImgUrl", "")
+                    weatherKind = savedInstanceState.getString("weatherKind", "")
+
+                    lifecycleScope.launch(Dispatchers.Main){
+                        val weatherIcon = ImageView(requireContext())
+                        Picasso.get()
+                            .load(weatherImgUrl)
+                            .into(weatherIcon)
+
+                        setIconLayout(weatherIcon)
+
+                        val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
+                        weatherDataLayout?.removeAllViews()
+                        val weatherKindTextView = TextView(requireContext())
+                        weatherKindTextView.text = weatherKind
+
+                        weatherKindTextView.textSize = resources.getDimension(R.dimen.weather_type_text_size)
+                        weatherKindTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+                        weatherDataLayout?.addView(weatherKindTextView)
+                        weatherDataLayout?.addView(weatherIcon)
+
+                    }
+
+
+                }
+            }
+        }
+
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("cityName", cityName)
+        outState.putString("geoCords", geoCords)
+        outState.putString("tem", tem)
+        outState.putString("time", time)
+        outState.putString("pressure", pressure)
+        outState.putString("weatherImgUrl", weatherImgUrl)
+        outState.putString("weatherKind", weatherKind)
+
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,23 +136,28 @@ class BasicDataFragment : Fragment() {
 
     fun setWeatherData(weatherData: WeatherData){
         requireView().findViewById<TextView>(R.id.city).text = weatherData.name
+        cityName = weatherData.name
         requireView().findViewById<TextView>(R.id.geoCords).text =
             "${weatherData?.coord?.lat}° lat. ${weatherData?.coord?.lon}° lon."
+        geoCords = "${weatherData.coord.lat}° lat. ${weatherData.coord.lon}° lon."
         val temperature = requireView().findViewById<TextView>(R.id.temperature)
         temperature.text = "${Configuration.convertTemperatureByLetter(weatherData.main.temp, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
+        tem = "${Configuration.convertTemperatureByLetter(weatherData.main.temp, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
         val zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
 
 
         requireView().findViewById<TextView>(R.id.time).text = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
+        time = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
         requireView().findViewById<TextView>(R.id.pressure).text = "${weatherData?.main?.pressure} hPa"
+        pressure = "${weatherData.main.pressure} hPa"
         val apiManager = ApiManager()
         apiManager.setWeatherUriByCityName(weatherData.weather[0].icon)
         lifecycleScope.launch(Dispatchers.Main) {
-            val imageView = ImageView(requireContext())
+            val weatherIcon = ImageView(requireContext())
             Picasso.get()
                 .load(apiManager.getWeatherUri())
-                .into(imageView)
+                .into(weatherIcon)
 
 
 
@@ -102,22 +170,27 @@ class BasicDataFragment : Fragment() {
 
             val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
 
-            val widthInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_width)
-            val heightInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_height)
-
-            val layoutParams = LayoutParams(
-                widthInPixels,
-                heightInPixels
-            )
-
-            imageView.layoutParams = layoutParams
+            setIconLayout(weatherIcon)
             weatherDataLayout?.removeAllViews()
             weatherDataLayout?.addView(weatherType)
-            weatherDataLayout?.addView(imageView)
+            weatherDataLayout?.addView(weatherIcon)
 
+            weatherImgUrl = apiManager.getWeatherUri()
+            weatherKind = weatherType.text.toString()
         }
     }
 
+    private fun setIconLayout(weatherIcon: ImageView) {
+        val widthInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_width)
+        val heightInPixels = resources.getDimensionPixelSize(R.dimen.weather_img_height)
+
+        val layoutParams = LayoutParams(
+            widthInPixels,
+            heightInPixels
+        )
+
+        weatherIcon.layoutParams = layoutParams
+    }
 
 
 }
