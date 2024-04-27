@@ -162,15 +162,16 @@ class WeatherForecastFragment : Fragment() {
                     .load(apiManager.getWeatherUri())
                     .into(imageView)
 
-                val layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                val screenWidth = view.resources.displayMetrics.widthPixels
-                val screenHeight = view.resources.displayMetrics.heightPixels
+                val widthInPixels = view.resources.getDimensionPixelSize(R.dimen.weather_img_width)
+                val heightInPixels = view.resources.getDimensionPixelSize(R.dimen.weather_img_height)
 
-                layoutParams.width = (screenWidth * 0.7).toInt()
-                layoutParams.height = (screenHeight * 0.2).toInt()
+                val layoutParams = LinearLayout.LayoutParams(
+                    widthInPixels,
+                    heightInPixels
+                )
+
+                imageView.layoutParams = layoutParams
+
                 imageView.layoutParams = layoutParams
                 weatherMainData.addView(imageView)
 

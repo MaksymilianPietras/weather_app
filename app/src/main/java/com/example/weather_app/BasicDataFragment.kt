@@ -75,10 +75,9 @@ class BasicDataFragment : Fragment() {
         requireView().findViewById<TextView>(R.id.city).text = weatherData.name
         requireView().findViewById<TextView>(R.id.geoCords).text =
             "${weatherData?.coord?.lat}° lat. ${weatherData?.coord?.lon}° lon."
-        requireView().findViewById<TextView>(R.id.temperature).text =
-            weatherData.main.temp.let { Configuration.getTemperature(it, Configuration.getTemperatureUnit()) }
-
-        var zonedDateTime = getTimeForPlace(weatherData)
+        val temperature = requireView().findViewById<TextView>(R.id.temperature)
+        temperature.text = "${Configuration.convertTemperatureByLetter(weatherData.main.temp, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
+        val zonedDateTime = getTimeForPlace(weatherData)
         requireView().findViewById<TextView>(R.id.time).text = "${zonedDateTime?.hour}:${zonedDateTime?.minute}"
 
 

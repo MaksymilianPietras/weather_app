@@ -102,8 +102,6 @@ class MainActivity : AppCompatActivity() {
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
 
-        //TODO naprawić włączanie timera bo daje niepełne info i sie wiesza
-
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
         createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter, this, this)
 
