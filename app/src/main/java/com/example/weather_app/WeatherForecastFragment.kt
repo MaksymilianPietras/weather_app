@@ -141,7 +141,7 @@ class WeatherForecastFragment : Fragment() {
             layoutParams.topMargin = marginTopPx
             forecastDataBlock.layoutParams = layoutParams
 
-            forecastDataBlock.setBackgroundResource(R.drawable.city_btn_background)
+            forecastDataBlock.setBackgroundResource(R.drawable.additional_info_background)
             forecastDataBlock.gravity = Gravity.CENTER
             forecastDataBlock.marginTop
         }

@@ -155,7 +155,7 @@ class CitiesFragment : Fragment() {
         cityLabel.gravity = Gravity.CENTER
         val cityBtn = Button(requireContext())
         cityBtn.text = cityName
-        cityBtn.setBackgroundResource(R.drawable.city_btn_background)
+        cityBtn.setBackgroundResource(R.drawable.additional_info_background)
         cityBtn.gravity = Gravity.CENTER
         cityBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColor))
         cityBtn.setAutoSizeTextTypeUniformWithConfiguration(resources.getDimension(R.dimen.city_label_text_min_size).toInt(),
