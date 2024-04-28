@@ -15,6 +15,7 @@ import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 
 import androidx.lifecycle.lifecycleScope
@@ -101,6 +102,18 @@ class MainActivity : AppCompatActivity() {
         val fragmentList = mutableListOf(BasicDataFragment(), CitiesFragment(), WindFragment.newInstance(weatherData), WeatherForecastFragment.newInstance(weatherForecast, apiManager?.getForecastUri()))
         viewPagerAdapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
         findViewById<ViewPager2>(R.id.viewPager).adapter = viewPagerAdapter
+
+
+        val basicDataFragment = (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment)
+        if (weatherData != null && weatherForecast != null && apiManager != null) {
+            basicDataFragment.setWeatherData(weatherData)
+            setAdditionalInfoFragment(viewPagerAdapter, weatherData)
+            setForecastFragment(
+                viewPagerAdapter,
+                weatherForecast,
+                apiManager.getForecastUri()
+            )
+        }
 
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
         createGettingFavouriteCityDataRoutine(citiesNames, viewPagerAdapter, this, this)

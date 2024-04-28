@@ -86,6 +86,18 @@ class FileManager {
             )
 
             val newFileContent = citiesData.toMutableList()
+
+            for (data in newFileContent){
+                if (data.name == weatherData.name){
+                    newFileContent.remove(data)
+                    newFileContent.add(weatherData)
+                    val contentToSave = Gson().toJson(newFileContent)
+                    outputStream.bufferedWriter().use { it.write(contentToSave) }
+                    outputStream.close()
+                    return
+                }
+            }
+
             newFileContent.add(weatherData)
             val contentToSave = Gson().toJson(newFileContent)
 
@@ -105,6 +117,8 @@ class FileManager {
 
             for (forecast in newFileContent){
                 if (forecast.city.name == weatherForecast.city.name){
+                    newFileContent.remove(forecast)
+                    newFileContent.add(weatherForecast)
                     val contentToSave = Gson().toJson(newFileContent)
                     outputStream.bufferedWriter().use { it.write(contentToSave) }
                     outputStream.close()
