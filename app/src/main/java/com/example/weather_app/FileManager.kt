@@ -105,6 +105,9 @@ class FileManager {
 
             for (forecast in newFileContent){
                 if (forecast.city.name == weatherForecast.city.name){
+                    val contentToSave = Gson().toJson(newFileContent)
+                    outputStream.bufferedWriter().use { it.write(contentToSave) }
+                    outputStream.close()
                     return
                 }
             }

@@ -250,18 +250,33 @@ class CitiesFragment : Fragment() {
             context: Context,
             activity: FragmentActivity
         ) {
-            val citiesData = MainActivity.setLocationDataByCityName(cityName, context, adapter)
-            val weatherData = citiesData[0] as WeatherData?
-            val weatherForecast = citiesData[1] as WeatherForecast?
+            val weatherData = MainActivity.getLocationDataByCityName(cityName, context)
+            val weatherForecast = MainActivity.getLocationForecastByCityName(cityName, context)
             if (weatherData != null && weatherForecast != null) {
-                FileManager.removeCityFromInternalStorage(cityName, activity)
+                val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+                val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
+                if (currentPickedCity == cityName){
+                    basicDataFragment.setWeatherData(weatherData)
+                    MainActivity.setAdditionalInfoFragment(adapter, weatherData)
+                    val apiManager = ApiManager()
+                    apiManager.setForecastUri(cityName)
+
+                    MainActivity.setForecastFragment(
+                        adapter,
+                        weatherForecast,
+                        apiManager.getForecastUri()
+                    )
+                }
+
                 val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                 val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                 weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
                 weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
                 FileManager.saveCityDataToInternalStorage(weatherData, activity)
                 FileManager.saveCityForecastToInternalStorage(weatherForecast, activity)
+
             }
+
         }
         fun getCityNameAndLastUpdateDateFromRow(weatherData: WeatherData) =
             listOf(

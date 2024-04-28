@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun setForecastFragment(
+        fun setForecastFragment(
             viewPagerAdapter: ViewPagerAdapter,
             weatherForecast: WeatherForecast,
             weatherApiUri: String
