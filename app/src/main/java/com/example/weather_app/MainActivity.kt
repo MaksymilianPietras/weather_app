@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
 
             val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
             val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")
+
             val localDateTime = LocalDateTime.parse(cityData[1], formatter)
             val cityRefreshTime = ZonedDateTime.of(localDateTime, ZoneOffset.UTC)
 
@@ -86,8 +87,10 @@ class MainActivity : AppCompatActivity() {
                 apiManager.setForecastUri(fileData[0].name)
                 if (weatherData != null && weatherForecast != null){
                     weatherData.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
+                    weatherData.formattedGettingDataTime.substring(0, weatherData.formattedGettingDataTime.length - 1)
                     FileManager.saveCityDataToInternalStorage(weatherData, this)
                     weatherForecast.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
+                    weatherForecast.formattedGettingDataTime.substring(0, weatherForecast.formattedGettingDataTime.length - 1)
                     FileManager.saveCityForecastToInternalStorage(weatherForecast, this)
                 }
 
