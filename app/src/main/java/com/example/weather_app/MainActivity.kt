@@ -86,11 +86,10 @@ class MainActivity : AppCompatActivity() {
                 apiManager = ApiManager()
                 apiManager.setForecastUri(fileData[0].name)
                 if (weatherData != null && weatherForecast != null){
-                    weatherData.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
-                    weatherData.formattedGettingDataTime.substring(0, weatherData.formattedGettingDataTime.length - 1)
+                    val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                    weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
                     FileManager.saveCityDataToInternalStorage(weatherData, this)
-                    weatherForecast.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
-                    weatherForecast.formattedGettingDataTime.substring(0, weatherForecast.formattedGettingDataTime.length - 1)
+                    weatherForecast.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
                     FileManager.saveCityForecastToInternalStorage(weatherForecast, this)
                 }
 
@@ -111,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         val basicDataFragment = (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment)
         if (weatherData != null && weatherForecast != null && apiManager != null) {
-            basicDataFragment.lifecycleScope.launch {
+            lifecycleScope.launch {
                 basicDataFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     basicDataFragment.setWeatherData(weatherData)
                     setAdditionalInfoFragment(viewPagerAdapter, weatherData)
