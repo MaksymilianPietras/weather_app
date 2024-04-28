@@ -85,7 +85,9 @@ class MainActivity : AppCompatActivity() {
                 apiManager = ApiManager()
                 apiManager.setForecastUri(fileData[0].name)
                 if (weatherData != null && weatherForecast != null){
+                    weatherData.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
                     FileManager.saveCityDataToInternalStorage(weatherData, this)
+                    weatherForecast.formattedGettingDataTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).toString()
                     FileManager.saveCityForecastToInternalStorage(weatherForecast, this)
                 }
 
@@ -106,13 +108,18 @@ class MainActivity : AppCompatActivity() {
 
         val basicDataFragment = (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment)
         if (weatherData != null && weatherForecast != null && apiManager != null) {
-            basicDataFragment.setWeatherData(weatherData)
-            setAdditionalInfoFragment(viewPagerAdapter, weatherData)
-            setForecastFragment(
-                viewPagerAdapter,
-                weatherForecast,
-                apiManager.getForecastUri()
-            )
+            basicDataFragment.lifecycleScope.launch {
+                basicDataFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    basicDataFragment.setWeatherData(weatherData)
+                    setAdditionalInfoFragment(viewPagerAdapter, weatherData)
+                    setForecastFragment(
+                        viewPagerAdapter,
+                        weatherForecast,
+                        apiManager.getForecastUri()
+                    )
+                }
+            }
+
         }
 
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)

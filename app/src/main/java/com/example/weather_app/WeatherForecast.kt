@@ -7,6 +7,7 @@ import android.os.Parcelable
 class WeatherForecast() : Parcelable{
     var city = City()
     var list: List<ForecastItem> = listOf()
+    var formattedGettingDataTime: String = ""
 
     constructor(parcel: Parcel) : this() {
 
