@@ -173,7 +173,7 @@ class CitiesFragment : Fragment() {
 
             for (city in fileContent){
                 val cityData = getCityNameAndLastUpdateDateFromRow(city)
-                if (cityData[0] == cityBtn.text){
+                if (cityData[0].uppercase() == cityBtn.text.toString().uppercase()){
                     val currentTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
                     val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")
                     val localDateTime = LocalDateTime.parse(cityData[1], formatter)
