@@ -189,7 +189,7 @@ class CitiesFragment : Fragment() {
 
             if (MainActivity.isNetworkAvailable(requireContext())){
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
-                    updateCityData(cityName, adapter, requireContext(), requireActivity())
+                    updateCityDataForCityBtn(cityName, adapter, requireContext(), requireActivity())
 
                 } else {
                     FileManager.setCityDataFromFileLines(fileContent, cityName, adapter)
@@ -271,6 +271,39 @@ class CitiesFragment : Fragment() {
                         apiManager.getForecastUri()
                     )
                 }
+
+                val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
+                val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                weatherData.formattedTime = String.format("%02d:%02d:%02d %02d.%02d.%d", zonedDateTime?.hour, zonedDateTime?.minute, zonedDateTime?.second, zonedDateTime?.dayOfMonth, zonedDateTime?.monthValue, zonedDateTime?.year)
+                weatherData.formattedGettingDataTime = String.format("%02d:%02d:%02d %02d.%02d.%d", currentUTCTime?.hour, currentUTCTime?.minute, currentUTCTime?.second, currentUTCTime?.dayOfMonth, currentUTCTime?.monthValue, currentUTCTime?.year)
+                FileManager.saveCityDataToInternalStorage(weatherData, activity)
+                FileManager.saveCityForecastToInternalStorage(weatherForecast, activity)
+
+            }
+
+        }
+
+        fun updateCityDataForCityBtn(
+            cityName: String,
+            adapter: MainActivity.ViewPagerAdapter,
+            context: Context,
+            activity: FragmentActivity
+        ) {
+            val weatherData = MainActivity.getLocationDataByCityName(cityName, context)
+            val weatherForecast = MainActivity.getLocationForecastByCityName(cityName, context)
+            if (weatherData != null && weatherForecast != null) {
+                val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+                basicDataFragment.setWeatherData(weatherData)
+                MainActivity.setAdditionalInfoFragment(adapter, weatherData)
+                val apiManager = ApiManager()
+                apiManager.setForecastUri(cityName)
+
+                MainActivity.setForecastFragment(
+                    adapter,
+                    weatherForecast,
+                    apiManager.getForecastUri()
+                )
+
 
                 val zonedDateTime = BasicDataFragment.getTimeForPlace(weatherData)
                 val currentUTCTime = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
