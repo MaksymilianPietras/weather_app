@@ -39,7 +39,8 @@ class FileManager {
             fileOutputStream.bufferedWriter().use { it.write(parsedFileContent) }
             fileOutputStream.close()
 
-            val weatherForecastData = readCitiesForecastFromInternalStorage(activity)
+            var weatherForecastData = readCitiesForecastFromInternalStorage(activity)
+            weatherForecastData = weatherForecastData.filter { it.city.name.uppercase() != city.uppercase() }
             val parsedForecastContent = Gson().toJson(weatherForecastData)
             val forecastInternalStorage = "weather_forecast.txt"
             val forecastFileOutputStream: FileOutputStream =
