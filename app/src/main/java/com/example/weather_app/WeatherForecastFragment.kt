@@ -87,6 +87,26 @@ class WeatherForecastFragment : Fragment() {
 
                 val tempRangeSubBlock = createDataSubBlock(view, element, weatherForecast.city.timezone)
 
+                forecastDataBlock.setOnClickListener {
+                    val forecastAdditionalInfoLayout =
+                        view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
+                    forecastAdditionalInfoLayout.visibility = View.VISIBLE
+                    val dataLayout =
+                        forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
+
+                    dataLayout.findViewById<TextView>(R.id.windPower).text =
+                        "Wind speed: ${element.wind.speed} m/sec"
+                    dataLayout.findViewById<TextView>(R.id.windDir).text =
+                        "Wind deg: ${element.wind.deg}°"
+
+                    dataLayout.findViewById<TextView>(R.id.humidity).text =
+                        "Humidity: ${element.main.humidity}%"
+                    dataLayout.findViewById<TextView>(R.id.visibility).text =
+                        "Visibility: ${element.visibility} m"
+                    dataLayout.findViewById<TextView>(R.id.pressure).text =
+                        "Pressure: ${element.main.pressure} hPa"
+                }
+
                 val weatherMainData = weatherForecastMainData(view, element)
 
 
@@ -233,27 +253,6 @@ class WeatherForecastFragment : Fragment() {
             dataSubBlock.tag = "forecastData"
             dataSubBlock.addView(maxTemp)
 
-            dataSubBlock.post {
-                dataSubBlock.setOnClickListener {
-                    val forecastAdditionalInfoLayout =
-                        view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
-                    forecastAdditionalInfoLayout.visibility = View.VISIBLE
-                    val dataLayout =
-                        forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
-
-                    dataLayout.findViewById<TextView>(R.id.windPower).text =
-                        "Wind speed: ${forecastItem.wind.speed} m/sec"
-                    dataLayout.findViewById<TextView>(R.id.windDir).text =
-                        "Wind deg: ${forecastItem.wind.deg}°"
-
-                    dataLayout.findViewById<TextView>(R.id.humidity).text =
-                        "Humidity: ${forecastItem.main.humidity}%"
-                    dataLayout.findViewById<TextView>(R.id.visibility).text =
-                        "Visibility: ${forecastItem.visibility} m"
-                    dataLayout.findViewById<TextView>(R.id.pressure).text =
-                        "Pressure: ${forecastItem.main.pressure} hPa"
-                }
-            }
             return dataSubBlock
         }
 

@@ -222,20 +222,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        fun setLocationDataByCityName(cityName: String, context: Context, viewPagerAdapter: ViewPagerAdapter): List<Any?>{
-            val weatherData = getLocationDataByCityName(cityName, context)
-            val weatherForecast = getLocationForecastByCityName(cityName, context)
-            if (weatherData != null && weatherForecast != null){
-                (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(weatherData)
-                setAdditionalInfoFragment(viewPagerAdapter, weatherData)
-                val apiManager = ApiManager()
-                apiManager.setForecastUri(cityName)
-
-                setForecastFragment(viewPagerAdapter, weatherForecast, apiManager.getForecastUri())
-            }
-            return listOf(weatherData, weatherForecast)
-        }
-
 
         fun setAdditionalInfoFragment(
             viewPagerAdapter: ViewPagerAdapter,
@@ -272,12 +258,12 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{
+        private fun getLocationDataByCityCords(location: android.location.Location?, context: Context): WeatherData?{
             if (location != null) {
                 var weatherData: WeatherData
-                var apiManager = ApiManager(location.latitude, location.longitude)
+                val apiManager = ApiManager(location.latitude, location.longitude)
                 runBlocking {
-                    var body = Fuel.get(apiManager.getApiUri()).body
+                    val body = Fuel.get(apiManager.getApiUri()).body
                     weatherData = Gson().fromJson(body, WeatherData::class.java)
                 }
                 if (weatherData.name == ""){

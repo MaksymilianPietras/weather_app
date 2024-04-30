@@ -23,8 +23,6 @@ class WeatherForecast() : Parcelable{
         var main = Main()
         var weather: List<Weather> = listOf()
         var wind = Wind()
-        var pressure: Int = 0
-        var humidity: Int = 0
         var visibility: Int = 0
         var dt: Long = 0
 
@@ -41,10 +39,8 @@ class WeatherForecast() : Parcelable{
         var temp_max: Double = 0.0
         var pressure: Int = 0
         var humidity: Int = 0
-        var feels_like: Double = 0.0
     }
     inner class Weather{
-        var main: String = ""
         var icon: String = ""
     }
 
