@@ -15,7 +15,6 @@ import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.widget.TextView
 import androidx.core.app.ActivityCompat
 
 import androidx.lifecycle.lifecycleScope
