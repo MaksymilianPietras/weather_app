@@ -193,12 +193,12 @@ class CitiesFragment : Fragment() {
                     updateCityDataForCityBtn(cityName, adapter, requireContext(), requireActivity())
 
                 } else {
-                    FileManager.setCityDataFromFileLines(fileContent, cityName, adapter)
+                    FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, requireContext(), requireActivity())
 
                 }
 
             } else {
-                FileManager.setCityDataFromFileLines(fileContent, cityName, adapter)
+                FileManager.setCityDataFromFileLines(fileContent, cityName, adapter, requireContext(), requireActivity())
                 adapter.getFragmentAtPosition(0).requireView().findViewById<TextView>(R.id.city).text =
                     "$cityName (Przestarzałe dane)"
             }

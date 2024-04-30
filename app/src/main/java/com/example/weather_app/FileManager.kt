@@ -1,5 +1,6 @@
 package com.example.weather_app
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -17,13 +18,12 @@ class FileManager {
             citiesData: List<WeatherData>,
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
+            context: Context,
+            activity: FragmentActivity
         ) {
             for (cityData in citiesData) {
                 if (cityData.name == cityName) {
-                    (adapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(
-                        cityData,
-                    )
-                    MainActivity.setAdditionalInfoFragment(adapter, cityData)
+                    CitiesFragment.updateCityDataForCityBtn(cityName, adapter, context, activity)
                     break
                 }
             }
