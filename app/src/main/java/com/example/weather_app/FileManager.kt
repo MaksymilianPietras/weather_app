@@ -31,7 +31,7 @@ class FileManager {
 
         fun removeCityFromInternalStorage(city: String, activity: FragmentActivity) {
             var fileContent = readCitiesDataFromInternalStorage(activity)
-            fileContent = fileContent.filter { it.name != city }
+            fileContent = fileContent.filter { it.name.uppercase() != city.uppercase() }
             val parsedFileContent = Gson().toJson(fileContent)
             val internalStorage = "weather_data.txt"
             val fileOutputStream: FileOutputStream =
