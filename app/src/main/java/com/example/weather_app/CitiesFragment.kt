@@ -185,8 +185,13 @@ class CitiesFragment : Fragment() {
 
             }
             val adapter = requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
-            adapter.getFragmentAtPosition(0).requireView().findViewById<LinearLayout>(R.id.weatherMainData).removeAllViews()
+            //todo na tym sie wywala przy kliknieciu w miasto
+            val basicDataFragment = adapter.getFragmentAtPosition(0)
 
+            adapter.setCurrentItem(0)
+            // lifecycleScope.launch {
+               // basicDataFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//            basicDataFragment.view?.findViewById<LinearLayout>(R.id.weatherMainData)?.removeAllViews()
             if (MainActivity.isNetworkAvailable(requireContext())){
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA){
                     updateCityData(cityName, adapter, requireContext(), requireActivity())
@@ -201,7 +206,10 @@ class CitiesFragment : Fragment() {
                 adapter.getFragmentAtPosition(0).requireView().findViewById<TextView>(R.id.city).text =
                     "$cityName (Przestarzałe dane)"
             }
-            adapter.setCurrentItem(0)
+            //  }
+            // }
+
+
 
         }
 
@@ -259,7 +267,7 @@ class CitiesFragment : Fragment() {
             if (weatherData != null && weatherForecast != null) {
                 val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
                 val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
-                if (currentPickedCity == cityName){
+                if (currentPickedCity != cityName){
                     basicDataFragment.setWeatherData(weatherData)
                     MainActivity.setAdditionalInfoFragment(adapter, weatherData)
                     val apiManager = ApiManager()

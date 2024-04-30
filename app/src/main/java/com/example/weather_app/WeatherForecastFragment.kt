@@ -33,6 +33,7 @@ class WeatherForecastFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //todo z jakiejs przyczyny arguments null
         super.onViewCreated(view, savedInstanceState)
         if (arguments != null){
             val weatherForecast: WeatherForecast? = arguments?.getParcelable("WeatherForecast") as WeatherForecast?

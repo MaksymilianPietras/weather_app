@@ -18,6 +18,7 @@ class WeatherData{
         this.wind.deg = deg
     }
 
+
     constructor(windSpeed: Double, windDeg: Int, humidity: Int, visibility: Int, pressure: Double){
         this.wind.speed = windSpeed
         this.wind.deg = windDeg

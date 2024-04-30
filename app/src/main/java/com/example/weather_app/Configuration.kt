@@ -3,7 +3,7 @@ package com.example.weather_app
 import java.util.Locale
 
 object Configuration {
-    private lateinit var temperatureUnit: TemperatureUnit
+    private var temperatureUnit: TemperatureUnit = TemperatureUnit.K
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit){
         this.temperatureUnit = temperatureUnit
