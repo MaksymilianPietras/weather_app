@@ -21,4 +21,7 @@
     <dimen name="forecast_block_margin">20dp</dimen>
     <dimen name="weather_img_height">140dp</dimen>
     <dimen name="weather_img_width">140dp</dimen>
+    <dimen name="forecast_additional_info_margin_top_bottom">50dp</dimen>
+    <dimen name="forecast_additional_info_margin_left_right">150dp</dimen>
+    <dimen name="close_btn_size">50dp</dimen>
 </resources>

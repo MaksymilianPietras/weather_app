@@ -1,10 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/weather_app_background"
     tools:context=".WeatherForecastFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/forecastAdditionalInfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/forecast_additional_info_margin_top_bottom"
+        android:layout_marginEnd="@dimen/forecast_additional_info_margin_top_bottom"
+        android:layout_marginTop="@dimen/forecast_additional_info_margin_left_right"
+        android:layout_marginBottom="@dimen/forecast_additional_info_margin_left_right"
+        android:background="@drawable/forecast_additional_info_background"
+        android:gravity="center"
+        android:elevation="10dp"
+        android:visibility="invisible"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/closeForecastExtraInfoBtn"
+            android:layout_width="@dimen/close_btn_size"
+            android:layout_height="@dimen/close_btn_size"
+            android:background="@drawable/close_btn_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/additionalDataPane"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/closeForecastExtraInfoBtn">
+
+            <TextView
+                android:id="@+id/windPower"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/plain_normal"
+                android:text="wind speed" />
+
+            <TextView
+                android:layout_marginTop="@dimen/labels_margin"
+                android:id="@+id/windDir"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/plain_normal"
+                android:text="wind deg" />
+
+            <TextView
+                android:layout_marginTop="@dimen/labels_margin"
+                android:id="@+id/humidity"
+                android:textColor="@color/white"
+                android:gravity="center"
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/plain_normal"
+                android:text="humidity" />
+
+            <TextView
+                android:layout_marginTop="@dimen/labels_margin"
+                android:id="@+id/visibility"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/plain_normal"
+                android:text="visibility" />
+
+            <TextView
+                android:layout_marginTop="@dimen/labels_margin"
+                android:id="@+id/pressure"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/plain_normal"
+                android:text="pressure" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:id="@+id/mainPanel"

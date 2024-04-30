@@ -18,12 +18,11 @@ class FileManager {
             citiesData: List<WeatherData>,
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
-            context: Context,
             activity: FragmentActivity
         ) {
             for (cityData in citiesData) {
                 if (cityData.name == cityName) {
-                    CitiesFragment.updateCityDataForCityBtn(cityName, adapter, context, activity)
+                    CitiesFragment.updateCityDataForCityBtnFromFile(cityName, adapter, activity)
                     break
                 }
             }
@@ -157,5 +156,49 @@ class FileManager {
 
             return citiesForecast
         }
+        fun readCitiesForecastFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherForecast {
+            val internalStorage = "weather_forecast.txt"
+            val fileContent: String
+            var citiesForecast: List<WeatherForecast> = ArrayList()
+            try {
+
+                val inputStream: FileInputStream = activity.openFileInput(internalStorage)
+                fileContent = inputStream.bufferedReader().use { it.readText() }
+                val typeToken = object : TypeToken<List<WeatherForecast>>() {}.type
+                if (fileContent != ""){
+                    citiesForecast = Gson().fromJson(fileContent, typeToken)
+                    citiesForecast = citiesForecast.filter { it.city.name.uppercase() == cityName.uppercase() }
+
+                }
+
+                inputStream.close()
+            } catch (_: FileNotFoundException) {}
+
+            return citiesForecast[0]
+        }
+
+        fun readCitiesDataFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherData {
+            val internalStorage = "weather_data.txt"
+            val fileContent: String
+            var citiesData: List<WeatherData> = ArrayList()
+            try {
+
+                val inputStream: FileInputStream = activity.openFileInput(internalStorage)
+                fileContent = inputStream.bufferedReader().use { it.readText() }
+                val typeToken = object : TypeToken<List<WeatherData>>() {}.type
+                if (fileContent != ""){
+                    citiesData = Gson().fromJson(fileContent, typeToken)
+                    citiesData = citiesData.filter { it.name.uppercase() == cityName.uppercase() }
+
+                }
+
+                inputStream.close()
+            } catch (_: FileNotFoundException) {}
+
+            return citiesData[0]
+        }
     }
+
+
 }
+

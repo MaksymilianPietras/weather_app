@@ -1,5 +1,6 @@
 package com.example.weather_app
 
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -8,10 +9,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -40,6 +43,10 @@ class WeatherForecastFragment : Fragment() {
             if (apiUri != null && weatherForecast != null) {
                 setForecastInfo(weatherForecast, view)
             }
+        }
+
+        view.findViewById<ImageView>(R.id.closeForecastExtraInfoBtn).setOnClickListener {
+            view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo).visibility = View.INVISIBLE
         }
     }
 
@@ -79,6 +86,7 @@ class WeatherForecastFragment : Fragment() {
                 setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
 
                 val tempRangeSubBlock = createDataSubBlock(view, element, weatherForecast.city.timezone)
+
                 val weatherMainData = weatherForecastMainData(view, element)
 
 
@@ -224,12 +232,35 @@ class WeatherForecastFragment : Fragment() {
             maxTemp.id = R.id.maxTemp
             dataSubBlock.tag = "forecastData"
             dataSubBlock.addView(maxTemp)
+
+            dataSubBlock.post {
+                dataSubBlock.setOnClickListener {
+                    val forecastAdditionalInfoLayout =
+                        view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
+                    forecastAdditionalInfoLayout.visibility = View.VISIBLE
+                    val dataLayout =
+                        forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
+
+                    dataLayout.findViewById<TextView>(R.id.windPower).text =
+                        "Wind speed: ${forecastItem.wind.speed} m/sec"
+                    dataLayout.findViewById<TextView>(R.id.windDir).text =
+                        "Wind deg: ${forecastItem.wind.deg}°"
+
+                    dataLayout.findViewById<TextView>(R.id.humidity).text =
+                        "Humidity: ${forecastItem.main.humidity}%"
+                    dataLayout.findViewById<TextView>(R.id.visibility).text =
+                        "Visibility: ${forecastItem.visibility} m"
+                    dataLayout.findViewById<TextView>(R.id.pressure).text =
+                        "Pressure: ${forecastItem.main.pressure} hPa"
+                }
+            }
             return dataSubBlock
         }
 
-        fun convertUnixTimestampToUtc(unixTimestamp: Long): ZonedDateTime {
+        private fun convertUnixTimestampToUtc(unixTimestamp: Long): ZonedDateTime {
             val instant = Instant.ofEpochSecond(unixTimestamp)
             return ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"))
         }
     }
+
 }
