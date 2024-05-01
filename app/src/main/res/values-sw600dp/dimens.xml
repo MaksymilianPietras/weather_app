@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="plain_header">60sp</dimen>
+    <dimen name="plain_extra">40sp</dimen>
+    <dimen name="plain_normal">50sp</dimen>
+    <dimen name="plain_temperature">100sp</dimen>
+    <dimen name="basic_fragment_top_margin">160sp</dimen>
+    <dimen name="city_label_height">200dp</dimen>
+    <dimen name="weather_main_data_layout_height">300dp</dimen>
+    <dimen name="city_label_text_max_size">20sp</dimen>
+    <dimen name="city_label_text_min_size">10sp</dimen>
+    <dimen name="weather_type_text_size">20sp</dimen>
+    <dimen name="labels_margin">80dp</dimen>
+    <dimen name="trash_image_padding_top_bottom">30dp</dimen>
+    <dimen name="trash_image_padding_left_right">40dp</dimen>
+    <dimen name="cities_scroll_pane_margin_top">40dp</dimen>
+    <dimen name="additional_info_2_elements_text_margin">30dp</dimen>
+    <dimen name="additional_info_3_elements_text_margin">12dp</dimen>
+    <dimen name="forecast_default_info_text_size">10sp</dimen>
+    <dimen name="forecast_header_info_text_size">18sp</dimen>
+    <dimen name="forecast_block_margin">40dp</dimen>
+    <dimen name="weather_img_height">280dp</dimen>
+    <dimen name="weather_img_width">280dp</dimen>
+    <dimen name="forecast_additional_info_margin_top_bottom">100dp</dimen>
+    <dimen name="forecast_additional_info_margin_left_right">300dp</dimen>
+    <dimen name="close_btn_size">100dp</dimen>
+    <dimen name="add_city_btn_height">70dp</dimen>
+    <dimen name="forecast_main_data_left_margin">50dp</dimen>
+    <dimen name="forecast_additional_data_right_margin">50dp</dimen>
+</resources>

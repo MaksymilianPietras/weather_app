@@ -1,5 +1,6 @@
 package com.example.weather_app
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -17,13 +18,11 @@ class FileManager {
             citiesData: List<WeatherData>,
             cityName: String,
             adapter: MainActivity.ViewPagerAdapter,
+            activity: FragmentActivity
         ) {
             for (cityData in citiesData) {
                 if (cityData.name == cityName) {
-                    (adapter.getFragmentAtPosition(0) as BasicDataFragment).setWeatherData(
-                        cityData,
-                    )
-                    MainActivity.setAdditionalInfoFragment(adapter, cityData)
+                    CitiesFragment.updateCityDataForCityBtnFromFile(cityName, adapter, activity)
                     break
                 }
             }
@@ -31,7 +30,7 @@ class FileManager {
 
         fun removeCityFromInternalStorage(city: String, activity: FragmentActivity) {
             var fileContent = readCitiesDataFromInternalStorage(activity)
-            fileContent = fileContent.filter { it.name != city }
+            fileContent = fileContent.filter { it.name.uppercase() != city.uppercase() }
             val parsedFileContent = Gson().toJson(fileContent)
             val internalStorage = "weather_data.txt"
             val fileOutputStream: FileOutputStream =
@@ -39,7 +38,8 @@ class FileManager {
             fileOutputStream.bufferedWriter().use { it.write(parsedFileContent) }
             fileOutputStream.close()
 
-            val weatherForecastData = readCitiesForecastFromInternalStorage(activity)
+            var weatherForecastData = readCitiesForecastFromInternalStorage(activity)
+            weatherForecastData = weatherForecastData.filter { it.city.name.uppercase() != city.uppercase() }
             val parsedForecastContent = Gson().toJson(weatherForecastData)
             val forecastInternalStorage = "weather_forecast.txt"
             val forecastFileOutputStream: FileOutputStream =
@@ -156,5 +156,49 @@ class FileManager {
 
             return citiesForecast
         }
+        fun readCitiesForecastFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherForecast {
+            val internalStorage = "weather_forecast.txt"
+            val fileContent: String
+            var citiesForecast: List<WeatherForecast> = ArrayList()
+            try {
+
+                val inputStream: FileInputStream = activity.openFileInput(internalStorage)
+                fileContent = inputStream.bufferedReader().use { it.readText() }
+                val typeToken = object : TypeToken<List<WeatherForecast>>() {}.type
+                if (fileContent != ""){
+                    citiesForecast = Gson().fromJson(fileContent, typeToken)
+                    citiesForecast = citiesForecast.filter { it.city.name.uppercase() == cityName.uppercase() }
+
+                }
+
+                inputStream.close()
+            } catch (_: FileNotFoundException) {}
+
+            return citiesForecast[0]
+        }
+
+        fun readCitiesDataFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherData {
+            val internalStorage = "weather_data.txt"
+            val fileContent: String
+            var citiesData: List<WeatherData> = ArrayList()
+            try {
+
+                val inputStream: FileInputStream = activity.openFileInput(internalStorage)
+                fileContent = inputStream.bufferedReader().use { it.readText() }
+                val typeToken = object : TypeToken<List<WeatherData>>() {}.type
+                if (fileContent != ""){
+                    citiesData = Gson().fromJson(fileContent, typeToken)
+                    citiesData = citiesData.filter { it.name.uppercase() == cityName.uppercase() }
+
+                }
+
+                inputStream.close()
+            } catch (_: FileNotFoundException) {}
+
+            return citiesData[0]
+        }
     }
+
+
 }
+

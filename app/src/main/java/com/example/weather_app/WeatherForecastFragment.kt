@@ -1,5 +1,6 @@
 package com.example.weather_app
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -12,16 +13,20 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import androidx.core.view.marginLeft
 import androidx.core.view.marginTop
+import androidx.core.view.setMargins
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+
+private const val DP_FOR_TABLET = 600
 
 class WeatherForecastFragment : Fragment() {
 
@@ -40,6 +45,12 @@ class WeatherForecastFragment : Fragment() {
             val apiUri = arguments?.getString("forecastUri")
             if (apiUri != null && weatherForecast != null) {
                 setForecastInfo(weatherForecast, view)
+            }
+        }
+
+        if (!isTablet(view.context)){
+            view.findViewById<ImageView>(R.id.closeForecastExtraInfoBtn).setOnClickListener {
+                view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo).visibility = View.INVISIBLE
             }
         }
     }
@@ -80,16 +91,106 @@ class WeatherForecastFragment : Fragment() {
                 setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
 
                 val tempRangeSubBlock = createDataSubBlock(view, element, weatherForecast.city.timezone)
-                val weatherMainData = weatherForecastMainData(view, element)
 
+                val weatherMainData = weatherForecastMainData(view, element)
 
                 forecastDataBlock.addView(tempRangeSubBlock)
                 forecastDataBlock.addView(weatherMainData)
 
+                if (isTablet(view.context)){
+
+                    createTabletForecastAdditionalInfoLayout(view, element, forecastDataBlock)
+
+
+                } else {
+                    forecastDataBlock.setOnClickListener {
+                        val forecastAdditionalInfoLayout =
+                            view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
+                        forecastAdditionalInfoLayout.visibility = View.VISIBLE
+                        val dataLayout =
+                            forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
+
+                        setForecastAdditionalInfo(element, dataLayout.findViewById(R.id.windPower),
+                            dataLayout.findViewById(R.id.windDir), dataLayout.findViewById(R.id.humidity),
+                            dataLayout.findViewById(R.id.visibility), dataLayout.findViewById(R.id.pressure))
+                    }
+                }
 
                 mainContainer.addView(forecastDataBlock)
             }
 
+        }
+
+        private fun createTabletForecastAdditionalInfoLayout(
+            view: View,
+            element: WeatherForecast.ForecastItem,
+            forecastDataBlock: LinearLayout
+        ) {
+            val forecastAdditionalInfo = LinearLayout(view.context)
+            forecastAdditionalInfo.orientation = LinearLayout.VERTICAL
+            forecastAdditionalInfo.gravity = Gravity.CENTER
+
+            val layoutParams = LinearLayout.LayoutParams(
+                400,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            layoutParams.setMargins(
+                0,
+                0,
+                view.resources.getDimension(R.dimen.forecast_additional_data_right_margin).toInt(),
+                0
+            )
+            forecastAdditionalInfo.layoutParams = layoutParams
+
+            val windPower = createTextView(view)
+            val windDir = createTextView(view)
+            val humidity = createTextView(view)
+            val visibility = createTextView(view)
+            val pressure = createTextView(view)
+
+            setForecastAdditionalInfo(element, windPower, windDir, humidity, visibility, pressure)
+            forecastAdditionalInfo.addView(windPower)
+            forecastAdditionalInfo.addView(windDir)
+            forecastAdditionalInfo.addView(humidity)
+            forecastAdditionalInfo.addView(visibility)
+            forecastAdditionalInfo.addView(pressure)
+
+            forecastDataBlock.addView(forecastAdditionalInfo)
+        }
+
+        private fun setForecastAdditionalInfo(
+            element: WeatherForecast.ForecastItem,
+            windPower: TextView,
+            windDir: TextView,
+            humidity: TextView,
+            visibility: TextView,
+            pressure: TextView
+        ) {
+            windPower.text =
+                "Wind speed: ${element.wind.speed} m/sec"
+            windDir.text =
+                "Wind deg: ${element.wind.deg}°"
+
+            humidity.text =
+                "Humidity: ${element.main.humidity}%"
+            visibility.text =
+                "Visibility: ${element.visibility} m"
+            pressure.text =
+                "Pressure: ${element.main.pressure} hPa"
+        }
+
+        private fun createTextView(view: View): TextView{
+            val textView = TextView(view.context)
+            textView.setTextColor(ContextCompat.getColor(view.context, R.color.white))
+            textView.gravity = Gravity.CENTER
+            textView.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
+            return textView
+        }
+
+        private fun isTablet(context: Context): Boolean {
+            val displayMetrics = context.resources.displayMetrics
+            val smallestWidthDp = displayMetrics.widthPixels / displayMetrics.density
+            return smallestWidthDp >= DP_FOR_TABLET
         }
 
         fun switchTemperatureUnit(view: View){
@@ -188,6 +289,14 @@ class WeatherForecastFragment : Fragment() {
             val dataSubBlock = LinearLayout(view.context)
             dataSubBlock.orientation = LinearLayout.VERTICAL
             dataSubBlock.gravity = Gravity.CENTER
+            dataSubBlock.layoutParams
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.setMargins(view.resources.getDimension(R.dimen.forecast_main_data_left_margin).toInt(), 0,0,0)
+            dataSubBlock.layoutParams = layoutParams
+
 
             var zonedDateTime = convertUnixTimestampToUtc(forecastItem.dt)
             zonedDateTime = zonedDateTime.plusSeconds(timezone)
@@ -225,12 +334,14 @@ class WeatherForecastFragment : Fragment() {
             maxTemp.id = R.id.maxTemp
             dataSubBlock.tag = "forecastData"
             dataSubBlock.addView(maxTemp)
+
             return dataSubBlock
         }
 
-        fun convertUnixTimestampToUtc(unixTimestamp: Long): ZonedDateTime {
+        private fun convertUnixTimestampToUtc(unixTimestamp: Long): ZonedDateTime {
             val instant = Instant.ofEpochSecond(unixTimestamp)
             return ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"))
         }
     }
+
 }
