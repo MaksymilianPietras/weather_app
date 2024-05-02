@@ -30,30 +30,27 @@ private const val DP_FOR_TABLET = 600
 
 class WeatherForecastFragment : Fragment() {
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //todo z jakiejs przyczyny arguments null
         super.onViewCreated(view, savedInstanceState)
-        if (arguments != null){
-            val weatherForecast: WeatherForecast? = arguments?.getParcelable("WeatherForecast") as WeatherForecast?
+        if (arguments != null) {
+            val weatherForecast: WeatherForecast? =
+                arguments?.getParcelable("WeatherForecast") as WeatherForecast?
             val apiUri = arguments?.getString("forecastUri")
             if (apiUri != null && weatherForecast != null) {
                 setForecastInfo(weatherForecast, view)
             }
         }
 
-        if (!isTablet(view.context)){
+        if (!isTablet(view.context)) {
             view.findViewById<ImageView>(R.id.closeForecastExtraInfoBtn).setOnClickListener {
-                view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo).visibility = View.INVISIBLE
+                view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo).visibility =
+                    View.INVISIBLE
             }
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,9 +60,12 @@ class WeatherForecastFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(weatherForecast: WeatherForecast?, forecastApiUri: String?): WeatherForecastFragment {
+        fun newInstance(
+            weatherForecast: WeatherForecast?,
+            forecastApiUri: String?
+        ): WeatherForecastFragment {
             val fragment = WeatherForecastFragment()
-            if (weatherForecast == null || forecastApiUri == null){
+            if (weatherForecast == null || forecastApiUri == null) {
                 return fragment
             }
             val args = Bundle().apply {
@@ -76,7 +76,7 @@ class WeatherForecastFragment : Fragment() {
             return fragment
         }
 
-        fun setForecastInfo(weatherForecast: WeatherForecast, view: View){
+        fun setForecastInfo(weatherForecast: WeatherForecast, view: View) {
             val mainContainer = view.findViewById<LinearLayout>(R.id.mainContainer)
             mainContainer.removeAllViews()
             weatherForecast.list.forEach { element ->
@@ -90,18 +90,16 @@ class WeatherForecastFragment : Fragment() {
 
                 setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
 
-                val tempRangeSubBlock = createDataSubBlock(view, element, weatherForecast.city.timezone)
+                val tempRangeSubBlock =
+                    createDataSubBlock(view, element, weatherForecast.city.timezone)
 
                 val weatherMainData = weatherForecastMainData(view, element)
 
                 forecastDataBlock.addView(tempRangeSubBlock)
                 forecastDataBlock.addView(weatherMainData)
 
-                if (isTablet(view.context)){
-
+                if (isTablet(view.context)) {
                     createTabletForecastAdditionalInfoLayout(view, element, forecastDataBlock)
-
-
                 } else {
                     forecastDataBlock.setOnClickListener {
                         val forecastAdditionalInfoLayout =
@@ -110,15 +108,19 @@ class WeatherForecastFragment : Fragment() {
                         val dataLayout =
                             forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
 
-                        setForecastAdditionalInfo(element, dataLayout.findViewById(R.id.windPower),
-                            dataLayout.findViewById(R.id.windDir), dataLayout.findViewById(R.id.humidity),
-                            dataLayout.findViewById(R.id.visibility), dataLayout.findViewById(R.id.pressure))
+                        setForecastAdditionalInfo(
+                            element,
+                            dataLayout.findViewById(R.id.windPower),
+                            dataLayout.findViewById(R.id.windDir),
+                            dataLayout.findViewById(R.id.humidity),
+                            dataLayout.findViewById(R.id.visibility),
+                            dataLayout.findViewById(R.id.pressure)
+                        )
                     }
                 }
 
                 mainContainer.addView(forecastDataBlock)
             }
-
         }
 
         private fun createTabletForecastAdditionalInfoLayout(
@@ -166,20 +168,14 @@ class WeatherForecastFragment : Fragment() {
             visibility: TextView,
             pressure: TextView
         ) {
-            windPower.text =
-                "Wind speed: ${element.wind.speed} m/sec"
-            windDir.text =
-                "Wind deg: ${element.wind.deg}°"
-
-            humidity.text =
-                "Humidity: ${element.main.humidity}%"
-            visibility.text =
-                "Visibility: ${element.visibility} m"
-            pressure.text =
-                "Pressure: ${element.main.pressure} hPa"
+            windPower.text = "Wind speed: ${element.wind.speed} m/sec"
+            windDir.text = "Wind deg: ${element.wind.deg}°"
+            humidity.text = "Humidity: ${element.main.humidity}%"
+            visibility.text = "Visibility: ${element.visibility} m"
+            pressure.text = "Pressure: ${element.main.pressure} hPa"
         }
 
-        private fun createTextView(view: View): TextView{
+        private fun createTextView(view: View): TextView {
             val textView = TextView(view.context)
             textView.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             textView.gravity = Gravity.CENTER
@@ -193,25 +189,23 @@ class WeatherForecastFragment : Fragment() {
             return smallestWidthDp >= DP_FOR_TABLET
         }
 
-        fun switchTemperatureUnit(view: View){
-
+        fun switchTemperatureUnit(view: View) {
             view.findViewById<LinearLayout>(R.id.mainContainer).children.forEach { child ->
                 if (child is LinearLayout) {
                     val avgTemp = child.findViewById<TextView>(R.id.avgTemp)
                     val minTemp = child.findViewById<TextView>(R.id.minTemp)
                     val maxTemp = child.findViewById<TextView>(R.id.maxTemp)
 
-                    avgTemp.text = Configuration.convertTemperatureByLetter(avgTemp.text.substring(0, avgTemp.text.indexOf("°")).toDouble(),
-                        avgTemp.text.substring(avgTemp.text.indexOf("°") + 1), Configuration.getTemperatureUnit().name)
-                        .toString() + "°${Configuration.getTemperatureUnit().name}"
+                    avgTemp.text = Configuration.convertTemperatureByLetter(
+                        avgTemp.text.substring(0, avgTemp.text.indexOf("°")).toDouble(),
+                        avgTemp.text.substring(avgTemp.text.indexOf("°") + 1),
+                        Configuration.getTemperatureUnit().name
+                    ).toString() + "°${Configuration.getTemperatureUnit().name}"
 
                     minTemp.text = convertTemperatureFromRange(minTemp, "MIN: ")
                     maxTemp.text = convertTemperatureFromRange(maxTemp, "MAX: ")
-
-
                 }
             }
-
         }
 
         private fun convertTemperatureFromRange(temp: TextView, label: String) =
@@ -220,8 +214,7 @@ class WeatherForecastFragment : Fragment() {
                     .toDouble(),
                 temp.text.substring(temp.text.indexOf("°") + 1),
                 Configuration.getTemperatureUnit().name
-            )
-                .toString() + "°${Configuration.getTemperatureUnit().name}"
+            ).toString() + "°${Configuration.getTemperatureUnit().name}"
 
         private fun setForecastDataBlockParams(
             view: View,
@@ -265,7 +258,8 @@ class WeatherForecastFragment : Fragment() {
                     .into(imageView)
 
                 val widthInPixels = view.resources.getDimensionPixelSize(R.dimen.weather_img_width)
-                val heightInPixels = view.resources.getDimensionPixelSize(R.dimen.weather_img_height)
+                val heightInPixels =
+                    view.resources.getDimensionPixelSize(R.dimen.weather_img_height)
 
                 val layoutParams = LinearLayout.LayoutParams(
                     widthInPixels,
@@ -294,14 +288,21 @@ class WeatherForecastFragment : Fragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            layoutParams.setMargins(view.resources.getDimension(R.dimen.forecast_main_data_left_margin).toInt(), 0,0,0)
+            layoutParams.setMargins(
+                view.resources.getDimension(R.dimen.forecast_main_data_left_margin).toInt(), 0, 0, 0
+            )
             dataSubBlock.layoutParams = layoutParams
 
 
             var zonedDateTime = convertUnixTimestampToUtc(forecastItem.dt)
             zonedDateTime = zonedDateTime.plusSeconds(timezone)
             val date = TextView(view.context)
-            date.text = String.format("Date: %02d.%02d.%d", zonedDateTime.dayOfMonth, zonedDateTime.monthValue, zonedDateTime.year)
+            date.text = String.format(
+                "Date: %02d.%02d.%d",
+                zonedDateTime.dayOfMonth,
+                zonedDateTime.monthValue,
+                zonedDateTime.year
+            )
             date.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
             date.setTextColor(ContextCompat.getColor(view.context, R.color.white))
 
@@ -314,21 +315,37 @@ class WeatherForecastFragment : Fragment() {
             dataSubBlock.addView(time)
 
             val avgTemp = TextView(view.context)
-            avgTemp.text = Configuration.convertTemperatureByLetter(forecastItem.main.temp, "K", Configuration.getTemperatureUnit().name).toString() + "°${Configuration.getTemperatureUnit().name}"
+            avgTemp.text = Configuration.convertTemperatureByLetter(
+                forecastItem.main.temp,
+                "K",
+                Configuration.getTemperatureUnit().name
+            ).toString() + "°${Configuration.getTemperatureUnit().name}"
             avgTemp.textSize = view.resources.getDimension(R.dimen.forecast_header_info_text_size)
             avgTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             avgTemp.id = R.id.avgTemp
             dataSubBlock.addView(avgTemp)
 
             val minTemp = TextView(view.context)
-            minTemp.text = "MIN: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_min, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
+            minTemp.text = "MIN: ${
+                Configuration.convertTemperatureByLetter(
+                    forecastItem.main.temp_min,
+                    "K",
+                    Configuration.getTemperatureUnit().name
+                )
+            }°${Configuration.getTemperatureUnit().name}"
             minTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
             minTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             minTemp.id = R.id.minTemp
             dataSubBlock.addView(minTemp)
 
             val maxTemp = TextView(view.context)
-            maxTemp.text = "MAX: ${Configuration.convertTemperatureByLetter(forecastItem.main.temp_max, "K", Configuration.getTemperatureUnit().name)}°${Configuration.getTemperatureUnit().name}"
+            maxTemp.text = "MAX: ${
+                Configuration.convertTemperatureByLetter(
+                    forecastItem.main.temp_max,
+                    "K",
+                    Configuration.getTemperatureUnit().name
+                )
+            }°${Configuration.getTemperatureUnit().name}"
             maxTemp.textSize = view.resources.getDimension(R.dimen.forecast_default_info_text_size)
             maxTemp.setTextColor(ContextCompat.getColor(view.context, R.color.white))
             maxTemp.id = R.id.maxTemp

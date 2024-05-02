@@ -1,8 +1,21 @@
 package com.example.weather_app
 
 
-class WeatherData{
-    constructor(name: String, lat: Double, lon: Double, temp: Double, timezone: Int, pressure: Double, weather: String, icon: String, visibility: Int, humidity: Int, speed: Double, deg: Int){
+class WeatherData {
+    constructor(
+        name: String,
+        lat: Double,
+        lon: Double,
+        temp: Double,
+        timezone: Int,
+        pressure: Double,
+        weather: String,
+        icon: String,
+        visibility: Int,
+        humidity: Int,
+        speed: Double,
+        deg: Int
+    ) {
         this.name = name
         this.coord.lat = lat
         this.coord.lon = lon
@@ -19,7 +32,7 @@ class WeatherData{
     }
 
 
-    constructor(windSpeed: Double, windDeg: Int, humidity: Int, visibility: Int, pressure: Double){
+    constructor(windSpeed: Double, windDeg: Int, humidity: Int, visibility: Int, pressure: Double) {
         this.wind.speed = windSpeed
         this.wind.deg = windDeg
         this.main.humidity = humidity
@@ -39,22 +52,22 @@ class WeatherData{
     var formattedTime: String = ""
     var formattedGettingDataTime: String = ""
 
-    inner class Coords{
+    inner class Coords {
         var lat: Double = 0.0
         var lon: Double = 0.0
     }
 
-    inner class Wind{
+    inner class Wind {
         var speed: Double = 0.0
         var deg: Int = 0
     }
 
-    inner class Weather{
+    inner class Weather {
         var main: String = ""
         var icon: String = ""
     }
 
-    inner class Main{
+    inner class Main {
         var temp: Double = 0.0
         var temp_min: Double = 0.0
         var temp_max: Double = 0.0

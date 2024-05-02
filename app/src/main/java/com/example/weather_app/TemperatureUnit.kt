@@ -5,16 +5,16 @@ enum class TemperatureUnit {
     C,
     F;
 
-    fun next(): TemperatureUnit{
-        return when(this){
+    fun next(): TemperatureUnit {
+        return when (this) {
             K -> C
             C -> F
             F -> K
         }
     }
 
-    fun prev(): TemperatureUnit{
-        return when(this){
+    fun prev(): TemperatureUnit {
+        return when (this) {
             K -> F
             F -> C
             C -> K
