@@ -17,7 +17,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -292,7 +296,12 @@ class CitiesFragment : Fragment() {
                 FileManager.readCitiesForecastFromInternalStorageByCityName(activity, cityName)
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-            WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
+            forecastFragment.lifecycleScope.launch{
+                forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
+                    WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
+                }
+            }
+
             basicDataFragment.setWeatherData(weatherData)
             MainActivity.setAdditionalInfoFragment(adapter, weatherData)
             ApiManager().setForecastUri(cityName)
