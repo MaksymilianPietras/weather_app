@@ -225,7 +225,12 @@ class WeatherForecastFragment : Fragment() {
             val screenHeight = view.resources.displayMetrics.heightPixels
 
             layoutParams.width = (screenWidth * 0.8).toInt()
-            layoutParams.height = (screenHeight * 0.2).toInt()
+            if (isTablet(view.context)){
+                layoutParams.height = (screenHeight * 0.3).toInt()
+            } else {
+                layoutParams.height = (screenHeight * 0.2).toInt()
+            }
+
 
             val marginTopPx = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
