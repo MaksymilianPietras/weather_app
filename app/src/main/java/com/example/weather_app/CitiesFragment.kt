@@ -291,6 +291,8 @@ class CitiesFragment : Fragment() {
             val weatherForecast =
                 FileManager.readCitiesForecastFromInternalStorageByCityName(activity, cityName)
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+            val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
+            WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
             basicDataFragment.setWeatherData(weatherData)
             MainActivity.setAdditionalInfoFragment(adapter, weatherData)
             ApiManager().setForecastUri(cityName)

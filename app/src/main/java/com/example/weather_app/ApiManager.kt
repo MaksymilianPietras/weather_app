@@ -6,9 +6,9 @@ class ApiManager {
     private val WEATHER_ICON_BASE_URI = "https://openweathermap.org/img/wn/"
     private val WEATHER_ICON_SUFFIX_URI = "@2x.png"
     private val FORECAST_API_BASE = "https://api.openweathermap.org/data/2.5/forecast"
-    private lateinit var forecastApiUrl: String
-    private lateinit var apiUri: String
-    private lateinit var iconUri: String
+    private var forecastApiUrl: String = ""
+    private var apiUri: String = ""
+    private var iconUri: String = ""
     fun getApiUri(): String{
         return apiUri
     }
