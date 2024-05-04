@@ -212,9 +212,6 @@ class MainActivity : AppCompatActivity() {
                         for (city in citiesNames) {
                             citiesFragment.updateCityData(city, adapter, context, activity)
                         }
-                        activity.runOnUiThread {
-                            Toast.makeText(context, "Zaktualizowano dane o miastach", Toast.LENGTH_SHORT).show()
-                    }
                 }
             }
 

@@ -254,6 +254,7 @@ class CitiesFragment : Fragment() {
                 activity.runOnUiThread {
                     basicDataFragment.setWeatherData(weatherData)
                     MainActivity.setAdditionalInfoFragment(adapter, weatherData)
+                    Toast.makeText(context, "Zaktualizowano dane o miastach", Toast.LENGTH_SHORT).show()
                 }
 
                 val apiManager = ApiManager()
