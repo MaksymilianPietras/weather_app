@@ -251,8 +251,11 @@ class CitiesFragment : Fragment() {
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
             if (currentPickedCity == cityName) {
-                basicDataFragment.setWeatherData(weatherData)
-                MainActivity.setAdditionalInfoFragment(adapter, weatherData)
+                activity.runOnUiThread {
+                    basicDataFragment.setWeatherData(weatherData)
+                    MainActivity.setAdditionalInfoFragment(adapter, weatherData)
+                }
+
                 val apiManager = ApiManager()
                 apiManager.setForecastUri(cityName)
             }
