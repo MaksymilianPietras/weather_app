@@ -31,7 +31,6 @@ const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
 const val FORECAST_FRAGMENT_INDEX = 3
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private var configuration: Configuration = Configuration
     private var locationManager = LocationManager()
@@ -43,13 +42,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         configuration.setTemperatureUnit(TemperatureUnit.K)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        if (locationManager.checkLocationPermission(this)) {
-            setYourLocationData()
-        } else {
-            locationManager.requestLocationPermission(this)
-        }
 
         val fileData = FileManager.readCitiesDataFromInternalStorage(this)
         val weatherForecastData = FileManager.readCitiesForecastFromInternalStorage(this)
@@ -151,49 +144,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setYourLocationData()
-            } else {
-                Toast.makeText(this, "Brak zgody na lokalizację!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setYourLocationData() {
-        if (locationManager.checkLocationPermission(this)) {
-            fusedLocationProviderClient.lastLocation
-                .addOnSuccessListener { location -> setLocationDataByCords(location, this, viewPagerAdapter) }
-        } else {
-            locationManager.requestLocationPermission(this)
-        }
-    }
-
-    private fun setLocationDataByCords(
-        location: android.location.Location?,
-        context: Context,
-        viewPagerAdapter: ViewPagerAdapter
-    ) {
-        if (location == null) return
-
-        val weatherData = locationManager.getLocationDataByCityCords(location, context)
-        val weatherForecast = locationManager.getLocationForecastByCityCords(location, context)
-        if (weatherData != null && weatherForecast != null) {
-            val basicFragment = viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment
-            basicFragment.setWeatherData(weatherData)
-            setAdditionalInfoFragment(viewPagerAdapter, weatherData)
-            ApiManager().setForecastUriByCords(location.latitude, location.longitude)
-        }
-    }
 
     companion object {
 
