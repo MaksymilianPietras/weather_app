@@ -4,4 +4,5 @@
     <dimen name="cities_scroll_pane_height_percent">0.80</dimen>
     <dimen name="delete_city_btn_width_percent">0.15</dimen>
     <dimen name="wind_data_block_height_percent">0.20</dimen>
+    <dimen name="additional_data_block_height_percent">0.30</dimen>
 </resources>

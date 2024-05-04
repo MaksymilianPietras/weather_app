@@ -28,5 +28,6 @@
     <dimen name="forecast_main_data_left_margin">20dp</dimen>
     <dimen name="forecast_additional_data_right_margin">20dp</dimen>
     <dimen name="wind_data_block_margin_top">100dp</dimen>
+    <dimen name="wind_fragment_row_padding">10dp</dimen>
 
 </resources>

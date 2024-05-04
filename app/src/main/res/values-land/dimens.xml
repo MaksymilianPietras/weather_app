@@ -2,5 +2,5 @@
 <resources>
     <dimen name="basic_fragment_top_margin">40sp</dimen>
     <dimen name="labels_margin">20dp</dimen>
-    <dimen name="wind_data_block_margin_top">50dp</dimen>
+    <dimen name="wind_data_block_margin_top">35dp</dimen>
 </resources>
