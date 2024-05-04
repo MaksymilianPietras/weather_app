@@ -4,7 +4,7 @@
     <dimen name="plain_extra">20sp</dimen>
     <dimen name="plain_normal">25sp</dimen>
     <dimen name="plain_temperature">50sp</dimen>
-    <dimen name="basic_fragment_top_margin">80sp</dimen>
+    <dimen name="basic_fragment_top_margin">80dp</dimen>
     <dimen name="city_label_height">100dp</dimen>
     <dimen name="weather_main_data_layout_height">150dp</dimen>
     <dimen name="city_label_text_max_size">10sp</dimen>

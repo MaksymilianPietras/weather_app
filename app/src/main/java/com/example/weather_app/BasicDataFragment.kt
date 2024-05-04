@@ -79,29 +79,32 @@ class BasicDataFragment : Fragment() {
     private fun updateMainWeatherDataUI(view: View) {
         val weatherType = TextView(requireContext())
         weatherType.text = weatherKind
-        lifecycleScope.launch(Dispatchers.Main) {
-            val weatherIcon = ImageView(requireContext())
-            Picasso.get()
-                .load(weatherImgUrl)
-                .into(weatherIcon)
+        if (weatherImgUrl != ""){
+            lifecycleScope.launch(Dispatchers.Main) {
+                val weatherIcon = ImageView(requireContext())
+                Picasso.get()
+                    .load(weatherImgUrl)
+                    .into(weatherIcon)
 
 
-            weatherType.gravity = Gravity.CENTER
-            weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
-            weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                weatherType.gravity = Gravity.CENTER
+                weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
+                weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
 
 
-            val weatherDataLayout = view.findViewById<LinearLayout>(R.id.weatherMainData)
+                val weatherDataLayout = view.findViewById<LinearLayout>(R.id.weatherMainData)
 
-            setIconLayout(weatherIcon)
-            weatherDataLayout?.removeAllViews()
-            weatherDataLayout?.addView(weatherType)
-            weatherDataLayout?.addView(weatherIcon)
+                setIconLayout(weatherIcon)
+                weatherDataLayout?.removeAllViews()
+                weatherDataLayout?.addView(weatherType)
+                weatherDataLayout?.addView(weatherIcon)
 
-            setWeatherPaneParams(weatherType)
+                setWeatherPaneParams(weatherType)
 
 
+            }
         }
+
     }
 
     override fun onCreateView(
