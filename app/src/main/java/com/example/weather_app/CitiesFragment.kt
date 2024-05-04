@@ -244,14 +244,13 @@ class CitiesFragment : Fragment() {
         adapter: MainActivity.ViewPagerAdapter,
         context: Context,
         activity: FragmentActivity,
-        changeCity: Boolean
     ) {
         val weatherData = locationManager.getLocationDataByCityName(cityName, context)
         val weatherForecast = locationManager.getLocationForecastByCityName(cityName, context)
         if (weatherData != null && weatherForecast != null) {
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
-            if (currentPickedCity != cityName && changeCity) {
+            if (currentPickedCity == cityName) {
                 basicDataFragment.setWeatherData(weatherData)
                 MainActivity.setAdditionalInfoFragment(adapter, weatherData)
                 val apiManager = ApiManager()
@@ -274,7 +273,7 @@ class CitiesFragment : Fragment() {
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
             basicDataFragment.setWeatherData(weatherData)
-            WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
+            WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
             MainActivity.setAdditionalInfoFragment(adapter, weatherData)
             ApiManager().setForecastUri(cityName)
             updateAndSaveData(weatherData, activity, weatherForecast)
@@ -283,7 +282,7 @@ class CitiesFragment : Fragment() {
 
 
     companion object {
-        const val SECONDS_TO_REFRESH_CITY_DATA = 15
+        const val SECONDS_TO_REFRESH_CITY_DATA = 10
 
         fun updateCityDataForCityBtnFromFile(
             cityName: String,
@@ -298,7 +297,7 @@ class CitiesFragment : Fragment() {
             val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
             forecastFragment.lifecycleScope.launch{
                 forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                    WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView())
+                    WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
                 }
             }
 

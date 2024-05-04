@@ -13,10 +13,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.marginTop
+import androidx.fragment.app.FragmentActivity
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
@@ -30,14 +32,13 @@ class WeatherForecastFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //todo z jakiejs przyczyny arguments null
         super.onViewCreated(view, savedInstanceState)
         if (arguments != null) {
             val weatherForecast: WeatherForecast? =
                 arguments?.getParcelable("WeatherForecast") as WeatherForecast?
             val apiUri = arguments?.getString("forecastUri")
             if (apiUri != null && weatherForecast != null) {
-                setForecastInfo(weatherForecast, view)
+                setForecastInfo(weatherForecast, view, requireActivity())
             }
         }
 
@@ -74,51 +75,54 @@ class WeatherForecastFragment : Fragment() {
             return fragment
         }
 
-        fun setForecastInfo(weatherForecast: WeatherForecast, view: View) {
+        fun setForecastInfo(weatherForecast: WeatherForecast, view: View, activity: FragmentActivity) {
             val mainContainer = view.findViewById<LinearLayout>(R.id.mainContainer)
             mainContainer.removeAllViews()
-            weatherForecast.list.forEach { element ->
-                val forecastDataBlock = LinearLayout(view.context)
-                forecastDataBlock.orientation = LinearLayout.HORIZONTAL
+            activity.runOnUiThread {
+                weatherForecast.list.forEach { element ->
+                    val forecastDataBlock = LinearLayout(view.context)
+                    forecastDataBlock.orientation = LinearLayout.HORIZONTAL
 
-                val layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
+                    val layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
 
-                setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
+                    setForecastDataBlockParams(view, layoutParams, forecastDataBlock)
 
-                val tempRangeSubBlock =
-                    createDataSubBlock(view, element, weatherForecast.city.timezone)
+                    val tempRangeSubBlock =
+                        createDataSubBlock(view, element, weatherForecast.city.timezone)
 
-                val weatherMainData = weatherForecastMainData(view, element)
+                    val weatherMainData = weatherForecastMainData(view, element)
 
-                forecastDataBlock.addView(tempRangeSubBlock)
-                forecastDataBlock.addView(weatherMainData)
+                    forecastDataBlock.addView(tempRangeSubBlock)
+                    forecastDataBlock.addView(weatherMainData)
 
-                if (isTablet(view.context)) {
-                    createTabletForecastAdditionalInfoLayout(view, element, forecastDataBlock)
-                } else {
-                    forecastDataBlock.setOnClickListener {
-                        val forecastAdditionalInfoLayout =
-                            view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
-                        forecastAdditionalInfoLayout.visibility = View.VISIBLE
-                        val dataLayout =
-                            forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
+                    if (isTablet(view.context)) {
+                        createTabletForecastAdditionalInfoLayout(view, element, forecastDataBlock)
+                    } else {
+                        forecastDataBlock.setOnClickListener {
+                            val forecastAdditionalInfoLayout =
+                                view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo)
+                            forecastAdditionalInfoLayout.visibility = View.VISIBLE
+                            val dataLayout =
+                                forecastAdditionalInfoLayout.findViewById<LinearLayout>(R.id.additionalDataPane)
 
-                        setForecastAdditionalInfo(
-                            element,
-                            dataLayout.findViewById(R.id.windPower),
-                            dataLayout.findViewById(R.id.windDir),
-                            dataLayout.findViewById(R.id.humidity),
-                            dataLayout.findViewById(R.id.visibility),
-                            dataLayout.findViewById(R.id.pressure)
-                        )
+                            setForecastAdditionalInfo(
+                                element,
+                                dataLayout.findViewById(R.id.windPower),
+                                dataLayout.findViewById(R.id.windDir),
+                                dataLayout.findViewById(R.id.humidity),
+                                dataLayout.findViewById(R.id.visibility),
+                                dataLayout.findViewById(R.id.pressure)
+                            )
+                        }
                     }
-                }
 
-                mainContainer.addView(forecastDataBlock)
+                    mainContainer.addView(forecastDataBlock)
+                }
             }
+
         }
 
         private fun createTabletForecastAdditionalInfoLayout(

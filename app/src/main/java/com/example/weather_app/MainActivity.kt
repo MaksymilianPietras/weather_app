@@ -209,10 +209,10 @@ class MainActivity : AppCompatActivity() {
                 if (isNetworkAvailable(context)) {
                     val citiesFragment = adapter.getFragmentAtPosition(1) as CitiesFragment
 
-                    for (city in citiesNames) {
-                        citiesFragment.updateCityData(city, adapter, context, activity, false)
-                    }
                     activity.runOnUiThread {
+                        for (city in citiesNames) {
+                            citiesFragment.updateCityData(city, adapter, context, activity)
+                        }
                         Toast.makeText(context, "Zaktualizowano dane o miastach", Toast.LENGTH_SHORT).show()
                     }
                 }
