@@ -55,7 +55,7 @@
                     android:id="@+id/windPowerIcon"
                     android:layout_width="0dp"
                     android:layout_weight="0.2"
-                    android:layout_height="45dp"
+                    android:layout_height="@dimen/wind_fragment_icon_height"
 
                     android:src="@drawable/wind_power_icon" />
 
@@ -91,7 +91,7 @@
             <ImageView
                 android:id="@+id/windDirectionIcon"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
                 android:layout_weight="0.2"
                 android:src="@drawable/wind_direction_icon" />
         </LinearLayout>
@@ -139,7 +139,7 @@
             <ImageView
                 android:id="@+id/humidityIcon"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
                 android:layout_weight="0.2"
                 android:src="@drawable/humidity_icon" />
 
@@ -175,7 +175,7 @@
                 android:id="@+id/visibilityIcon"
                 android:layout_width="0dp"
                 android:layout_weight="0.2"
-                android:layout_height="45dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
                 android:src="@drawable/visibility_icon" />
 
         </LinearLayout>
@@ -210,7 +210,7 @@
                 android:id="@+id/pressureIcon"
                 android:layout_width="0dp"
                 android:layout_weight="0.2"
-                android:layout_height="45dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
                 android:src="@drawable/pressure_icon" />
 
         </LinearLayout>
