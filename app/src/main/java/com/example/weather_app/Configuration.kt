@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import java.util.Locale
 
 object Configuration {
-    var fragments: MutableList<Fragment>? = null // TODO: Można gdzieś przenieść ale musi być w singletonie
+    var fragments: MutableList<Fragment>? = null
     private var temperatureUnit: TemperatureUnit = TemperatureUnit.K
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit){

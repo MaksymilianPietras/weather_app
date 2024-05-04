@@ -72,6 +72,36 @@ class BasicDataFragment : Fragment() {
         view.findViewById<TextView>(R.id.temperature).text = tem
         view.findViewById<TextView>(R.id.time).text = time
         view.findViewById<TextView>(R.id.pressure).text = pressure
+
+        updateMainWeatherDataUI(view)
+    }
+
+    private fun updateMainWeatherDataUI(view: View) {
+        val weatherType = TextView(requireContext())
+        weatherType.text = weatherKind
+        lifecycleScope.launch(Dispatchers.Main) {
+            val weatherIcon = ImageView(requireContext())
+            Picasso.get()
+                .load(weatherImgUrl)
+                .into(weatherIcon)
+
+
+            weatherType.gravity = Gravity.CENTER
+            weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
+            weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+
+            val weatherDataLayout = view.findViewById<LinearLayout>(R.id.weatherMainData)
+
+            setIconLayout(weatherIcon)
+            weatherDataLayout?.removeAllViews()
+            weatherDataLayout?.addView(weatherType)
+            weatherDataLayout?.addView(weatherIcon)
+
+            setWeatherPaneParams(weatherType)
+
+
+        }
     }
 
     override fun onCreateView(
@@ -103,36 +133,18 @@ class BasicDataFragment : Fragment() {
             zonedDateTime?.year
         )
 
+        mainWeatherDataUpdate(weatherData)
+
         if (view != null) updateUI(requireView())
 
+    }
+
+    private fun mainWeatherDataUpdate(weatherData: WeatherData) {
         val apiManager = ApiManager()
-        apiManager.setWeatherUriByCityName(weatherData.weather[0].icon)
-        lifecycleScope.launch(Dispatchers.Main) {
-            val weatherIcon = ImageView(requireContext())
-            Picasso.get()
-                .load(apiManager.getWeatherUri())
-                .into(weatherIcon)
+        apiManager.setWeatherUriByWeatherCode(weatherData.weather[0].icon)
 
-            val weatherType = TextView(requireContext())
-            weatherType.text = weatherData.weather[0].main
-            weatherType.gravity = Gravity.CENTER
-
-            weatherType.textSize = resources.getDimension(R.dimen.weather_type_text_size)
-            weatherType.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-
-
-            val weatherDataLayout = view?.findViewById<LinearLayout>(R.id.weatherMainData)
-
-            setIconLayout(weatherIcon)
-            weatherDataLayout?.removeAllViews()
-            weatherDataLayout?.addView(weatherType)
-            weatherDataLayout?.addView(weatherIcon)
-
-            setWeatherPaneParams(weatherType)
-
-            weatherImgUrl = apiManager.getWeatherUri()
-            weatherKind = weatherType.text.toString()
-        }
+        weatherImgUrl = apiManager.getWeatherUri()
+        weatherKind = weatherData.weather[0].main
     }
 
     private fun setWeatherPaneParams(weatherType: TextView) {

@@ -16,9 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import androidx.core.view.marginLeft
 import androidx.core.view.marginTop
-import androidx.core.view.setMargins
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
@@ -254,7 +252,7 @@ class WeatherForecastFragment : Fragment() {
             weatherMainData.orientation = LinearLayout.HORIZONTAL
             weatherMainData.gravity = Gravity.CENTER
             val apiManager = ApiManager()
-            apiManager.setWeatherUriByCityName(element.weather[0].icon)
+            apiManager.setWeatherUriByWeatherCode(element.weather[0].icon)
 
             runBlocking {
                 val imageView = ImageView(view.context)

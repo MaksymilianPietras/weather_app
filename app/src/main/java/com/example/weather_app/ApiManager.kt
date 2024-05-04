@@ -13,7 +13,7 @@ class ApiManager {
         return apiUri
     }
 
-    fun setWeatherUriByCityName(code: String){
+    fun setWeatherUriByWeatherCode(code: String){
         iconUri = WEATHER_ICON_BASE_URI + code + WEATHER_ICON_SUFFIX_URI
     }
 
