@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 
+private const val TABLET_MIN_SCREEN_SIZE_DP = 600
+
 class CitiesFragment : Fragment() {
 
     private var locationManager = LocationManager()
@@ -231,11 +233,14 @@ class CitiesFragment : Fragment() {
 
     private fun setWidthByOrientation(): Float {
         val deleteButtonWidthPercent: Float =
-            if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+            if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE && resources.configuration.smallestScreenWidthDp >= TABLET_MIN_SCREEN_SIZE_DP){
+                0.12F
+            } else if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
                 0.1F
             } else {
                 0.2F
             }
+
         return deleteButtonWidthPercent
     }
 
