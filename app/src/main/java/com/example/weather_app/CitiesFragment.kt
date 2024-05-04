@@ -277,7 +277,11 @@ class CitiesFragment : Fragment() {
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
             basicDataFragment.setWeatherData(weatherData)
-            WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
+            forecastFragment.lifecycleScope.launch{
+                forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
+                    WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
+                }
+            }
             MainActivity.setAdditionalInfoFragment(adapter, weatherData)
             ApiManager().setForecastUri(cityName)
             updateAndSaveData(weatherData, activity, weatherForecast)
