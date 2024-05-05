@@ -255,7 +255,7 @@ class CitiesFragment : Fragment() {
         if (weatherData != null && weatherForecast != null) {
             val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
             val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
-            if (currentPickedCity == cityName) {
+            if (currentPickedCity.toString().uppercase() == cityName.uppercase()) {
                 activity.runOnUiThread {
                     basicDataFragment.setWeatherData(weatherData)
                     MainActivity.setAdditionalInfoFragment(adapter, weatherData)

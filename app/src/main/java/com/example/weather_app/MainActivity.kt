@@ -158,10 +158,13 @@ class MainActivity : AppCompatActivity() {
             val refreshCityDataTask = Runnable {
                 if (isNetworkAvailable(context)) {
                     val citiesFragment = adapter.getFragmentAtPosition(1) as CitiesFragment
-
+                    val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+                    if (basicDataFragment.isAdded){
                         for (city in citiesNames) {
                             citiesFragment.updateCityData(city, adapter, context, activity)
                         }
+                    }
+
                 }
             }
 
