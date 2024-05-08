@@ -15,16 +15,16 @@
 
         <TextView
             android:id="@+id/city"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="@dimen/basic_fragment_top_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:backgroundTint="@android:color/transparent"
             android:gravity="center"
-            android:text="city"
             android:shadowColor="@color/black"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="5"
+            android:text="city"
             android:textColor="@color/textColor"
             android:textColorLink="@android:color/transparent"
             android:textSize="@dimen/plain_header"
@@ -35,7 +35,7 @@
 
         <TextView
             android:id="@+id/geoCords"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:shadowColor="@color/black"
@@ -44,7 +44,6 @@
             android:shadowRadius="5"
             android:text="geoCords"
             android:textColor="@color/textColor"
-            android:layout_marginTop="@dimen/labels_margin"
             android:textSize="@dimen/plain_extra"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -107,15 +106,12 @@
 
         <LinearLayout
             android:id="@+id/weatherMainData"
-            android:layout_width="300dp"
-            android:layout_height="65dp"
-            android:layout_marginTop="@dimen/basic_fragment_top_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.20"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@+id/city"
             app:layout_constraintTop_toTopOf="parent" />
 
 

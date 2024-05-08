@@ -16,38 +16,70 @@
             android:id="@+id/windInfo"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="@dimen/wind_data_block_margin_top"
             android:background="@drawable/additional_info_background"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintHeight_percent="@dimen/wind_data_block_height_percent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.8" >
+            app:layout_constraintWidth_percent="0.80">
 
-            <TextView
-                android:id="@+id/windPower"
+            <LinearLayout
+                android:id="@+id/windPowerLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/transparent"
-                android:layout_marginTop="@dimen/additional_info_2_elements_text_margin"
-
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:text="wind power"
-                android:textColor="@color/textColor"
-                android:textColorLink="@android:color/transparent"
-                android:textSize="@dimen/plain_normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:padding="@dimen/wind_fragment_row_padding">
+
+                <TextView
+                    android:id="@+id/windPower"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.8"
+                    android:backgroundTint="@android:color/transparent"
+                    android:layout_marginEnd="@dimen/forecast_additional_data_right_margin"
+
+                    android:gravity="center"
+                    android:text="wind power"
+                    android:textColor="@color/textColor"
+                    android:textColorLink="@android:color/transparent"
+                    android:textSize="@dimen/plain_normal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/windPowerIcon"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.2"
+                    android:layout_height="@dimen/wind_fragment_icon_height"
+
+                    android:src="@drawable/wind_power_icon" />
+
+
+            </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/windDirectionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/wind_fragment_row_padding">
 
             <TextView
                 android:id="@+id/windDir"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
+                android:layout_marginEnd="@dimen/forecast_additional_data_right_margin"
                 android:backgroundTint="@android:color/transparent"
                 android:gravity="center"
-                android:layout_marginTop="@dimen/additional_info_2_elements_text_margin"
                 android:text="wind direction"
                 android:textColor="@color/textColor"
                 android:textColorLink="@android:color/transparent"
@@ -55,28 +87,46 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/windDirectionIcon"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
+                android:layout_weight="0.2"
+                android:src="@drawable/wind_direction_icon" />
+        </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/additionalInfo"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="116dp"
-            android:orientation="vertical"
+            android:layout_marginTop="@dimen/wind_data_block_margin_top"
             android:background="@drawable/additional_info_background"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintHeight_percent="@dimen/additional_data_block_height_percent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/windInfo"
-            app:layout_constraintWidth_percent="0.8">
+            app:layout_constraintWidth_percent="0.80">
+
+        <LinearLayout
+            android:id="@+id/humidityLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.33"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/wind_fragment_row_padding">
 
             <TextView
                 android:id="@+id/humidity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
                 android:backgroundTint="@android:color/transparent"
-                android:layout_marginTop="@dimen/additional_info_3_elements_text_margin"
-
+                android:layout_marginEnd="@dimen/forecast_additional_data_right_margin"
                 android:gravity="center"
                 android:text="humidity"
                 android:textColor="@color/textColor"
@@ -86,13 +136,32 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/humidityIcon"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/wind_fragment_icon_height"
+                android:layout_weight="0.2"
+                android:src="@drawable/humidity_icon" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/visibilityLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.33"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/wind_fragment_row_padding">
+
             <TextView
                 android:id="@+id/visibility"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
                 android:backgroundTint="@android:color/transparent"
-                android:layout_marginTop="@dimen/additional_info_3_elements_text_margin"
-
+                android:layout_marginEnd="@dimen/forecast_additional_data_right_margin"
                 android:gravity="center"
                 android:text="visibility"
                 android:textColor="@color/textColor"
@@ -101,13 +170,33 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/visibilityIcon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="@dimen/wind_fragment_icon_height"
+                android:src="@drawable/visibility_icon" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/pressureLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.33"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/wind_fragment_row_padding">
+
             <TextView
                 android:id="@+id/pressure"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
                 android:backgroundTint="@android:color/transparent"
-                android:layout_marginTop="@dimen/additional_info_3_elements_text_margin"
-
+                android:layout_marginEnd="@dimen/forecast_additional_data_right_margin"
                 android:gravity="center"
                 android:text="pressure"
                 android:textColor="@color/textColor"
@@ -116,6 +205,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/pressureIcon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="@dimen/wind_fragment_icon_height"
+                android:src="@drawable/pressure_icon" />
+
+        </LinearLayout>
+
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

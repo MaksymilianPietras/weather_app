@@ -1,9 +1,15 @@
 package com.example.weather_app
 
+import androidx.fragment.app.Fragment
 import java.util.Locale
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 
 object Configuration {
-    private lateinit var temperatureUnit: TemperatureUnit
+    var fragments: MutableList<Fragment>? = null
+    var isRefreshDataRoutineRunning = false
+    var scheduledExecutorService = Executors.newScheduledThreadPool(1)
+    private var temperatureUnit: TemperatureUnit = TemperatureUnit.K
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit){
         this.temperatureUnit = temperatureUnit

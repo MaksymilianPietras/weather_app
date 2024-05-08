@@ -3,4 +3,6 @@
     <dimen name="manage_cities_btn_width_percent">0.22</dimen>
     <dimen name="cities_scroll_pane_height_percent">0.6</dimen>
     <dimen name="delete_city_btn_width_percent">0.10</dimen>
+    <dimen name="wind_data_block_height_percent">0.30</dimen>
+    <dimen name="additional_data_block_height_percent">0.50</dimen>
 </resources>
