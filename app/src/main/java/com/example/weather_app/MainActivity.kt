@@ -1,22 +1,19 @@
 package com.example.weather_app
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
@@ -151,9 +148,13 @@ class MainActivity : AppCompatActivity() {
             citiesNames: List<String>,
             adapter: MainActivity.ViewPagerAdapter,
             context: Context,
-            activity: AppCompatActivity
+            activity: FragmentActivity
         ) {
-            val scheduler = Executors.newScheduledThreadPool(1)
+            if (Configuration.isRefreshDataRoutineRunning){
+                Configuration.scheduledExecutorService.shutdown()
+            }
+            Configuration.isRefreshDataRoutineRunning = true
+            Configuration.scheduledExecutorService = Executors.newScheduledThreadPool(1)
 
             val refreshCityDataTask = Runnable {
                 if (isNetworkAvailable(context)) {
@@ -168,7 +169,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            scheduler.scheduleAtFixedRate(refreshCityDataTask, 0, 10, TimeUnit.SECONDS)
+            Configuration.scheduledExecutorService.scheduleAtFixedRate(refreshCityDataTask, 0, 10, TimeUnit.SECONDS)
         }
 
 

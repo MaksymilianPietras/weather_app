@@ -108,11 +108,25 @@ class CitiesFragment : Fragment() {
                 if (weatherData != null && weatherForecast != null) {
                     updateAndSaveData(weatherData, requireActivity(), weatherForecast)
                     createFavouriteCityBtn(weatherData.name, view)
+
+                    refreshFavouriteDataRoutine()
                     Toast.makeText(context, "Pomyślnie dodano ${weatherData.name} do ulubionych", Toast.LENGTH_SHORT)
                         .show()
                 }
+            } else {
+                Toast.makeText(context, "Miasto $newCity jest już na liście ulubionych", Toast.LENGTH_SHORT)
+                    .show()
             }
+
         }
+    }
+
+    private fun refreshFavouriteDataRoutine() {
+        val fileData = FileManager.readCitiesDataFromInternalStorage(requireActivity())
+        val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
+        val adapter =
+            requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+        MainActivity.createGettingFavouriteCityDataRoutine(citiesNames, adapter, requireContext(), requireActivity())
     }
 
     private fun fileContainsCity(cityName: String, cities: List<WeatherData>): Boolean {
