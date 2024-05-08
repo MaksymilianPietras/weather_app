@@ -4,11 +4,13 @@ import androidx.fragment.app.Fragment
 import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.locks.ReentrantLock
 
 object Configuration {
     var fragments: MutableList<Fragment>? = null
     var isRefreshDataRoutineRunning = false
     var scheduledExecutorService = Executors.newScheduledThreadPool(1)
+    var fileLock = ReentrantLock()
     private var temperatureUnit: TemperatureUnit = TemperatureUnit.K
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit){

@@ -237,6 +237,7 @@ class CitiesFragment : Fragment() {
         deleteCityBtn.setOnClickListener {
             val city = cityBtn.text.toString()
             FileManager.removeCityFromInternalStorage(city, requireActivity())
+            refreshFavouriteDataRoutine()
             view.findViewById<LinearLayout>(R.id.favouriteCitiesLabel).removeView(cityLabel)
         }
 

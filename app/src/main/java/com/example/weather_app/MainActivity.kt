@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            Configuration.scheduledExecutorService.scheduleAtFixedRate(refreshCityDataTask, 0, 10, TimeUnit.SECONDS)
+            Configuration.scheduledExecutorService.scheduleAtFixedRate(refreshCityDataTask, 10, 10, TimeUnit.SECONDS)
         }
 
 

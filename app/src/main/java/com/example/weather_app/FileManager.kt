@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.withLock
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -29,6 +32,7 @@ class FileManager {
         }
 
         fun removeCityFromInternalStorage(city: String, activity: FragmentActivity) {
+            Configuration.fileLock.lock()
             var fileContent = readCitiesDataFromInternalStorage(activity)
             fileContent = fileContent.filter { it.name.uppercase() != city.uppercase() }
             val parsedFileContent = Gson().toJson(fileContent)
@@ -46,6 +50,7 @@ class FileManager {
                 activity.openFileOutput(forecastInternalStorage, AppCompatActivity.MODE_PRIVATE)
             forecastFileOutputStream.bufferedWriter().use { it.write(parsedForecastContent) }
             forecastFileOutputStream.close()
+            Configuration.fileLock.unlock()
         }
 
         fun getCitiesNamesFromFileContent(weathersData: List<WeatherData>): List<String> {
@@ -62,7 +67,7 @@ class FileManager {
             val fileContent: String
             var citiesData: List<WeatherData> = ArrayList()
             try {
-
+                Configuration.fileLock.lock()
                 val inputStream: FileInputStream = activity.openFileInput(internalStorage)
                 fileContent = inputStream.bufferedReader().use { it.readText() }
                 val typeToken = object : TypeToken<List<WeatherData>>() {}.type
@@ -72,6 +77,7 @@ class FileManager {
                 }
 
                 inputStream.close()
+                Configuration.fileLock.unlock()
             } catch (_: FileNotFoundException) {}
 
             return citiesData
@@ -81,7 +87,7 @@ class FileManager {
             weatherData: WeatherData,
             activity: FragmentActivity
         ) {
-
+            Configuration.fileLock.lock()
             val citiesData = readCitiesDataFromInternalStorage(activity)
             val internalStorage = "weather_data.txt"
             val outputStream: FileOutputStream = activity.openFileOutput(internalStorage,
@@ -97,6 +103,7 @@ class FileManager {
                     val contentToSave = Gson().toJson(newFileContent)
                     outputStream.bufferedWriter().use { it.write(contentToSave) }
                     outputStream.close()
+                    Configuration.fileLock.unlock()
                     return
                 }
             }
@@ -107,9 +114,13 @@ class FileManager {
             outputStream.bufferedWriter().use { it.write(contentToSave) }
 
             outputStream.close()
+            Configuration.fileLock.unlock()
+
+
         }
 
-        fun saveCityForecastToInternalStorage(weatherForecast: WeatherForecast, activity: FragmentActivity) {
+         fun saveCityForecastToInternalStorage(weatherForecast: WeatherForecast, activity: FragmentActivity) {
+            Configuration.fileLock.lock()
             val citiesForecast = readCitiesForecastFromInternalStorage(activity)
             val internalStorage = "weather_forecast.txt"
             val outputStream: FileOutputStream = activity.openFileOutput(internalStorage,
@@ -125,6 +136,7 @@ class FileManager {
                     val contentToSave = Gson().toJson(newFileContent)
                     outputStream.bufferedWriter().use { it.write(contentToSave) }
                     outputStream.close()
+                    Configuration.fileLock.unlock()
                     return
                 }
             }
@@ -135,14 +147,16 @@ class FileManager {
             outputStream.bufferedWriter().use { it.write(contentToSave) }
 
             outputStream.close()
+            Configuration.fileLock.unlock()
         }
 
         fun readCitiesForecastFromInternalStorage(activity: FragmentActivity): List<WeatherForecast> {
+
             val internalStorage = "weather_forecast.txt"
             val fileContent: String
             var citiesForecast: List<WeatherForecast> = ArrayList()
             try {
-
+                Configuration.fileLock.lock()
                 val inputStream: FileInputStream = activity.openFileInput(internalStorage)
                 fileContent = inputStream.bufferedReader().use { it.readText() }
                 val typeToken = object : TypeToken<List<WeatherForecast>>() {}.type
@@ -152,16 +166,18 @@ class FileManager {
                 }
 
                 inputStream.close()
+                Configuration.fileLock.unlock()
             } catch (_: FileNotFoundException) {}
 
             return citiesForecast
         }
         fun readCitiesForecastFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherForecast {
+
             val internalStorage = "weather_forecast.txt"
             val fileContent: String
             var citiesForecast: List<WeatherForecast> = ArrayList()
             try {
-
+                Configuration.fileLock.lock()
                 val inputStream: FileInputStream = activity.openFileInput(internalStorage)
                 fileContent = inputStream.bufferedReader().use { it.readText() }
                 val typeToken = object : TypeToken<List<WeatherForecast>>() {}.type
@@ -172,17 +188,19 @@ class FileManager {
                 }
 
                 inputStream.close()
+                Configuration.fileLock.unlock()
             } catch (_: FileNotFoundException) {}
 
             return citiesForecast[0]
         }
 
         fun readCitiesDataFromInternalStorageByCityName(activity: FragmentActivity, cityName: String): WeatherData {
+
             val internalStorage = "weather_data.txt"
             val fileContent: String
             var citiesData: List<WeatherData> = ArrayList()
             try {
-
+                Configuration.fileLock.lock()
                 val inputStream: FileInputStream = activity.openFileInput(internalStorage)
                 fileContent = inputStream.bufferedReader().use { it.readText() }
                 val typeToken = object : TypeToken<List<WeatherData>>() {}.type
@@ -193,6 +211,7 @@ class FileManager {
                 }
 
                 inputStream.close()
+                Configuration.fileLock.unlock()
             } catch (_: FileNotFoundException) {}
 
             return citiesData[0]
