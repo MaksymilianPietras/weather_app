@@ -101,18 +101,18 @@ class CitiesFragment : Fragment() {
             var newCity = requireView().findViewById<EditText>(R.id.cityNameText).text.toString()
             newCity = newCity.trim()
             val cities = FileManager.readCitiesDataFromInternalStorage(requireActivity())
+            val weatherData = locationManager.getLocationDataByCityName(newCity, requireContext())
+            val weatherForecast = locationManager.getLocationForecastByCityName(newCity, requireContext())
 
-            if (!fileContainsCity(newCity, cities)) {
-                val weatherData = locationManager.getLocationDataByCityName(newCity, requireContext())
-                val weatherForecast = locationManager.getLocationForecastByCityName(newCity, requireContext())
-                if (weatherData != null && weatherForecast != null) {
-                    updateAndSaveData(weatherData, requireActivity(), weatherForecast)
-                    createFavouriteCityBtn(weatherData.name, view)
 
-                    refreshFavouriteDataRoutine()
-                    Toast.makeText(context, "Pomyślnie dodano ${weatherData.name} do ulubionych", Toast.LENGTH_SHORT)
-                        .show()
-                }
+            if (weatherData != null && weatherForecast != null && !fileContainsCity(weatherData.name, cities)) {
+                updateAndSaveData(weatherData, requireActivity(), weatherForecast)
+                createFavouriteCityBtn(weatherData.name, view)
+
+                refreshFavouriteDataRoutine()
+                Toast.makeText(context, "Pomyślnie dodano ${weatherData.name} do ulubionych", Toast.LENGTH_SHORT)
+                    .show()
+
             } else {
                 Toast.makeText(context, "Miasto $newCity jest już na liście ulubionych", Toast.LENGTH_SHORT)
                     .show()
