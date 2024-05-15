@@ -57,10 +57,8 @@ class BasicDataFragment : Fragment() {
                     currentTemp.substring(0, currentTemp.indexOf("°")).toDouble(),
                     Configuration.getTemperatureUnit().prev()
                 )
-            val adapter =
-                requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
 
-            adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX).view?.let { it1 ->
+            Configuration.fragments?.get(FORECAST_FRAGMENT_INDEX)?.view?.let { it1 ->
                 WeatherForecastFragment.switchTemperatureUnit(it1)
             }
         }

@@ -26,9 +26,10 @@ import java.util.concurrent.TimeUnit
 
 const val ADDITIONAL_INFO_FRAGMENT_INDEX = 2
 const val FORECAST_FRAGMENT_INDEX = 3
+const val DP_FOR_TABLET = 600
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private var viewPagerAdapter: ViewPagerAdapter? = null
     private var configuration: Configuration = Configuration
     private var locationManager = LocationManager()
 
@@ -93,11 +94,29 @@ class MainActivity : AppCompatActivity() {
                 apiManager.setForecastUri(weatherData.name)
             }
         }
-
         val initialized = Configuration.fragments != null
 
         initializeFragments(initialized, weatherData, weatherForecast, apiManager)
-        addFragmentsAdapterToPager()
+        if (!isTablet(this)){
+            addFragmentsAdapterToPager()
+        } else {
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            for ((index, fragment) in Configuration.fragments?.withIndex()!!) {
+                val fragmentContainerId = when (index) {
+                    0 -> R.id.fragment1Container
+                    1 -> R.id.fragment2Container
+                    2 -> R.id.fragment3Container
+                    3 -> R.id.fragment4Container
+                    else -> -1
+                }
+
+                if (fragmentContainerId != -1) {
+                    fragmentTransaction.replace(fragmentContainerId, fragment)
+                }
+            }
+            fragmentTransaction.commit()
+        }
+
         launchTasks(initialized, weatherData, weatherForecast, fileData)
     }
 
@@ -113,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         fileData: List<WeatherData>,
     ) {
         if (initialized) return
-        val basicDataFragment = (viewPagerAdapter.getFragmentAtPosition(0) as BasicDataFragment)
+        val basicDataFragment = (Configuration.fragments?.get(0) as BasicDataFragment)
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
         if (weatherData != null && weatherForecast != null) {
             basicDataFragment.setWeatherData(weatherData)
@@ -144,9 +163,15 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
+        fun isTablet(context: Context): Boolean {
+            val displayMetrics = context.resources.displayMetrics
+            val smallestWidthDp = displayMetrics.widthPixels / displayMetrics.density
+            return smallestWidthDp >= DP_FOR_TABLET
+        }
+
         fun createGettingFavouriteCityDataRoutine(
             citiesNames: List<String>,
-            adapter: MainActivity.ViewPagerAdapter,
+            adapter: MainActivity.ViewPagerAdapter?,
             context: Context,
             activity: FragmentActivity
         ) {
@@ -158,8 +183,8 @@ class MainActivity : AppCompatActivity() {
 
             val refreshCityDataTask = Runnable {
                 if (isNetworkAvailable(context)) {
-                    val citiesFragment = adapter.getFragmentAtPosition(1) as CitiesFragment
-                    val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+                    val citiesFragment =Configuration.fragments?.get(1) as CitiesFragment
+                    val basicDataFragment = (Configuration.fragments?.get(0) as BasicDataFragment)
                     if (basicDataFragment.isAdded){
                         for (city in citiesNames) {
                             citiesFragment.updateCityData(city, adapter, context, activity)
@@ -174,14 +199,14 @@ class MainActivity : AppCompatActivity() {
 
 
         fun setAdditionalInfoFragment(
-            viewPagerAdapter: ViewPagerAdapter,
+            viewPagerAdapter: ViewPagerAdapter?,
             weatherData: WeatherData,
         ) {
-            if (viewPagerAdapter.itemCount > ADDITIONAL_INFO_FRAGMENT_INDEX) {
+            if (Configuration.fragments?.size!! > ADDITIONAL_INFO_FRAGMENT_INDEX) {
                 val windFragment =
-                    viewPagerAdapter.getFragmentAtPosition(ADDITIONAL_INFO_FRAGMENT_INDEX)
+                    Configuration.fragments?.get(ADDITIONAL_INFO_FRAGMENT_INDEX)
 
-                windFragment.lifecycleScope.launch {
+                windFragment?.lifecycleScope?.launch {
                     windFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         WindFragment.setLocationAdditionalInfo(
                             weatherData, windFragment.requireView()
@@ -189,7 +214,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                viewPagerAdapter.addFragmentToViewPager(WindFragment.newInstance(weatherData))
+                viewPagerAdapter?.addFragmentToViewPager(WindFragment.newInstance(weatherData))
             }
         }
 

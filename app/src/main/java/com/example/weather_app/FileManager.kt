@@ -20,7 +20,7 @@ class FileManager {
         fun setCityDataFromFileLines(
             citiesData: List<WeatherData>,
             cityName: String,
-            adapter: MainActivity.ViewPagerAdapter,
+            adapter: MainActivity.ViewPagerAdapter?,
             activity: FragmentActivity
         ) {
             for (cityData in citiesData) {

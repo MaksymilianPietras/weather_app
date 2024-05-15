@@ -26,8 +26,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 
-private const val DP_FOR_TABLET = 600
-
 class WeatherForecastFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -42,7 +40,7 @@ class WeatherForecastFragment : Fragment() {
             }
         }
 
-        if (!isTablet(view.context)) {
+        if (!MainActivity.isTablet(view.context)) {
             view.findViewById<ImageView>(R.id.closeForecastExtraInfoBtn).setOnClickListener {
                 view.findViewById<ConstraintLayout>(R.id.forecastAdditionalInfo).visibility =
                     View.INVISIBLE
@@ -98,7 +96,7 @@ class WeatherForecastFragment : Fragment() {
                     forecastDataBlock.addView(tempRangeSubBlock)
                     forecastDataBlock.addView(weatherMainData)
 
-                    if (isTablet(view.context)) {
+                    if (MainActivity.isTablet(view.context)) {
                         createTabletForecastAdditionalInfoLayout(view, element, forecastDataBlock)
                     } else {
                         forecastDataBlock.setOnClickListener {
@@ -185,12 +183,6 @@ class WeatherForecastFragment : Fragment() {
             return textView
         }
 
-        private fun isTablet(context: Context): Boolean {
-            val displayMetrics = context.resources.displayMetrics
-            val smallestWidthDp = displayMetrics.widthPixels / displayMetrics.density
-            return smallestWidthDp >= DP_FOR_TABLET
-        }
-
         fun switchTemperatureUnit(view: View) {
             view.findViewById<LinearLayout>(R.id.mainContainer).children.forEach { child ->
                 if (child is LinearLayout) {
@@ -227,7 +219,7 @@ class WeatherForecastFragment : Fragment() {
             val screenHeight = view.resources.displayMetrics.heightPixels
 
             layoutParams.width = (screenWidth * 0.8).toInt()
-            if (isTablet(view.context)){
+            if (MainActivity.isTablet(view.context)){
                 layoutParams.height = (screenHeight * 0.3).toInt()
             } else {
                 layoutParams.height = (screenHeight * 0.2).toInt()

@@ -124,8 +124,12 @@ class CitiesFragment : Fragment() {
     private fun refreshFavouriteDataRoutine() {
         val fileData = FileManager.readCitiesDataFromInternalStorage(requireActivity())
         val citiesNames = FileManager.getCitiesNamesFromFileContent(fileData)
-        val adapter =
-            requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+        val viewPager = requireActivity().findViewById<ViewPager2>(R.id.viewPager)
+        val adapter = if (viewPager != null) {
+            viewPager.adapter as MainActivity.ViewPagerAdapter
+        } else {
+            null
+        }
         MainActivity.createGettingFavouriteCityDataRoutine(citiesNames, adapter, requireContext(), requireActivity())
     }
 
@@ -143,7 +147,7 @@ class CitiesFragment : Fragment() {
         cityLabel.orientation = LinearLayout.HORIZONTAL
         val screenWidth = view.resources.displayMetrics.widthPixels
         cityLabel.layoutParams = LinearLayout.LayoutParams(
-            (screenWidth * 0.8).toInt(),
+            (screenWidth * 0.5).toInt(),
             resources.getDimensionPixelSize(R.dimen.city_label_height)
         )
 
@@ -186,10 +190,14 @@ class CitiesFragment : Fragment() {
                 }
 
             }
-            val adapter =
-                requireActivity().findViewById<ViewPager2>(R.id.viewPager).adapter as MainActivity.ViewPagerAdapter
+            val viewPager = requireActivity().findViewById<ViewPager2>(R.id.viewPager)
+            val adapter = if (viewPager != null) {
+                viewPager.adapter as MainActivity.ViewPagerAdapter
+            } else {
+                null
+            }
 
-            adapter.setCurrentItem(0)
+            adapter?.setCurrentItem(0)
 
             if (MainActivity.isNetworkAvailable(requireContext())) {
                 if (lastUpdateTimeDifference > SECONDS_TO_REFRESH_CITY_DATA) {
@@ -210,8 +218,8 @@ class CitiesFragment : Fragment() {
                     adapter,
                     requireActivity()
                 )
-                adapter.getFragmentAtPosition(0).requireView()
-                    .findViewById<TextView>(R.id.city).text =
+                Configuration.fragments?.get(0)?.requireView()
+                    ?.findViewById<TextView>(R.id.city)?.text =
                     "$cityName (Przestarzałe dane)"
             }
         }
@@ -261,14 +269,14 @@ class CitiesFragment : Fragment() {
 
     fun updateCityData(
         cityName: String,
-        adapter: MainActivity.ViewPagerAdapter,
+        adapter: MainActivity.ViewPagerAdapter?,
         context: Context,
         activity: FragmentActivity,
     ) {
         val weatherData = locationManager.getLocationDataByCityName(cityName, context)
         val weatherForecast = locationManager.getLocationForecastByCityName(cityName, context)
         if (weatherData != null && weatherForecast != null) {
-            val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
+            val basicDataFragment = (Configuration.fragments?.get(0) as BasicDataFragment)
             val currentPickedCity = basicDataFragment.requireView().findViewById<TextView>(R.id.city).text
             if (currentPickedCity.toString().uppercase() == cityName.uppercase()) {
                 activity.runOnUiThread {
@@ -287,17 +295,17 @@ class CitiesFragment : Fragment() {
 
     fun updateCityDataForCityBtn(
         cityName: String,
-        adapter: MainActivity.ViewPagerAdapter,
+        adapter: MainActivity.ViewPagerAdapter?,
         context: Context,
         activity: FragmentActivity
     ) {
         val weatherData = locationManager.getLocationDataByCityName(cityName, context)
         val weatherForecast = locationManager.getLocationForecastByCityName(cityName, context)
         if (weatherData != null && weatherForecast != null) {
-            val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
-            val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
+            val basicDataFragment = (Configuration.fragments?.get(0) as BasicDataFragment)
+            val forecastFragment = Configuration.fragments?.get(FORECAST_FRAGMENT_INDEX)
             basicDataFragment.setWeatherData(weatherData)
-            forecastFragment.lifecycleScope.launch{
+            forecastFragment?.lifecycleScope?.launch{
                 forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
                     WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
                 }
@@ -314,16 +322,16 @@ class CitiesFragment : Fragment() {
 
         fun updateCityDataForCityBtnFromFile(
             cityName: String,
-            adapter: MainActivity.ViewPagerAdapter,
+            adapter: MainActivity.ViewPagerAdapter?,
             activity: FragmentActivity
         ) {
             val weatherData =
                 FileManager.readCitiesDataFromInternalStorageByCityName(activity, cityName)
             val weatherForecast =
                 FileManager.readCitiesForecastFromInternalStorageByCityName(activity, cityName)
-            val basicDataFragment = (adapter.getFragmentAtPosition(0) as BasicDataFragment)
-            val forecastFragment = adapter.getFragmentAtPosition(FORECAST_FRAGMENT_INDEX)
-            forecastFragment.lifecycleScope.launch{
+            val basicDataFragment = (Configuration.fragments?.get(0) as BasicDataFragment)
+            val forecastFragment = Configuration.fragments?.get(FORECAST_FRAGMENT_INDEX)
+            forecastFragment?.lifecycleScope?.launch{
                 forecastFragment.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
                     WeatherForecastFragment.setForecastInfo(weatherForecast, forecastFragment.requireView(), forecastFragment.requireActivity())
                 }
